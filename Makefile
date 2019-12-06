@@ -39,11 +39,15 @@ build:
 ## test: Test the application
 test:
 	GO111MODULE=on go vet ./...
-	GO111MODULE=on go test ./...
+	GO111MODULE=on go test ./... -covermode=count -coverprofile=c.out ./...
 
 ## clean: Clean build files. Runs `go clean` internally.
 clean:
 	GO111MODULE=on go clean ./...
+
+## fmt: Runs `go fmt` internally.
+fmt:
+	GO111MODULE=on go fmt ./...
 
 ## compile: Clean and then compile the binary.
 compile: clean install build
@@ -56,7 +60,7 @@ watch:
 all: help
 help: Makefile
 	@echo
-	@echo " Choose a command run in "$(PROJECTNAME)":"
+	@echo " Choose a command run in "$(PROJECT)":"
 	@echo
 	@sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
 	@echo
