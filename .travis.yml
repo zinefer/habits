@@ -1,0 +1,26 @@
+dist: bionic
+
+services:
+  - postgresql
+addons:
+  postgresql: 10
+
+language: go
+go:
+- 1.12.x
+# Force-enable Go modules. This will be unnecessary when Go 1.14 lands.
+env: GO111MODULE=on
+
+# Only clone the most recent commit.
+git:
+  depth: 1
+
+before_script:
+  # Install goveralls to push code coverage to coverage.io
+  - go get github.com/mattn/goveralls
+
+script:
+  - make test
+  
+after_script:
+  - $GOPATH/bin/goveralls -coverprofile=c.out -service=travis-ci

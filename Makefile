@@ -38,6 +38,7 @@ build:
 
 ## test: Test the application
 test:
+	GO111MODULE=on go vet ./...
 	GO111MODULE=on go test ./...
 
 ## clean: Clean build files. Runs `go clean` internally.

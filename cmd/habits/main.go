@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"flag"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -18,7 +18,7 @@ func main() {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("welcome"))
 	})
-	
+
 	fmt.Printf("Listening on %s\n", listenAddr)
 	http.ListenAndServe(listenAddr, r)
 }
