@@ -18,6 +18,8 @@ git:
 before_script:
   # Install goveralls to push code coverage to coverage.io
   - go get github.com/mattn/goveralls
+  # Install vue-cli-service
+  - npm i @vue/cli-service
 
 script:
   - make test
