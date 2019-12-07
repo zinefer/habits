@@ -3,18 +3,23 @@
 ## Running Habits for Development
 
 ```bash
+$ npm install
 $ make install
 $ make start
+$ npm run serve
 ```
 
 # Testing Habits
 
 ```bash
 $ make test
+$ npm run test:unit
+$ npm run test:e2e
 ```
 
 ## Build Habits
 
 ```bash
 $ make compile
+$ npm run build
 ```

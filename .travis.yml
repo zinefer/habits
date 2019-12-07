@@ -21,6 +21,8 @@ before_script:
 
 script:
   - make test
+  - npm run test:unit
+  #- npm run test:e2e
   
 after_script:
   - $GOPATH/bin/goveralls -coverprofile=c.out -service=travis-ci
