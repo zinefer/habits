@@ -33,8 +33,11 @@ stop-server:
 restart-server: stop-server start-server
 
 ## build: Build the application
-build:
+build: build-js
 	GO111MODULE=on go build -o $(BIN)/$(PROJECT) $(MAIN)
+
+build-js:
+	npm run build
 
 ## test: Test the application
 test:
@@ -54,7 +57,7 @@ compile: clean install build
 
 ## watch: Run given command when code changes. e.g; make watch run="echo 'hey'"
 watch:
-	yolo -i . -e vendor -e bin -c "$(run)"
+	yolo -i . -e node_modules -e bin -e web/dist -c "$(run)"
 
 .PHONY: help
 all: help
