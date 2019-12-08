@@ -10,5 +10,6 @@ module.exports = {
         "@": path.resolve(__dirname, "web/src")
       }
     }
-  }
+  },
+  transpileDependencies: ["vuetify"]
 };
