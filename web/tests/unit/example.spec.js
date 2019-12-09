@@ -1,12 +1,20 @@
 import { shallowMount } from "@vue/test-utils";
 import HelloWorld from "@/components/HelloWorld.vue";
 
+let wrapper = null;
+
+beforeEach(() => {
+  wrapper = shallowMount(HelloWorld, {
+    stubs: ["v-flex", "v-img", "v-layout", "v-container"]
+  });
+});
+
+afterEach(() => {
+  wrapper.destroy();
+});
+
 describe("HelloWorld.vue", () => {
-  it("renders props.msg when passed", () => {
-    const msg = "new message";
-    const wrapper = shallowMount(HelloWorld, {
-      propsData: { msg }
-    });
-    expect(wrapper.text()).toMatch(msg);
+  it("renders welcome", () => {
+    expect(wrapper.text()).toContain("Welcome to Vuetify");
   });
 });
