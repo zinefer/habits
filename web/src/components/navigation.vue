@@ -54,7 +54,7 @@ export default {
   },
   computed: {
     isLoggedIn: function() {
-      return this.$store.auth.isLoggedIn;
+      return this.$store.isLoggedIn;
     }
   },
   methods: {
