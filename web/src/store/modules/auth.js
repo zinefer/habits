@@ -1,7 +1,11 @@
+import Cookies from "js-cookie";
+
+window.Cookies = Cookies;
+
 export default {
   state: {
     status: "",
-    token: localStorage.getItem("token") || "",
+    token: Cookies.get("current_user") || "",
     user: {}
   },
   getters: {

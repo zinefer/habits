@@ -18,7 +18,9 @@ describe("Application navigation", () => {
       ],
       mocks: {
         $store: {
-          isLoggedIn: false
+          getters: {
+            isLoggedIn: false
+          }
         }
       }
     };
@@ -39,7 +41,7 @@ describe("Application navigation", () => {
   });
 
   it("renders the user dropdown when logged in", () => {
-    options.mocks.$store.isLoggedIn = true;
+    options.mocks.$store.getters.isLoggedIn = true;
     wrapper = shallowMount(Navigation, options);
     expect(wrapper.find("v-menu-stub").text()).toContain("Sign out");
   });

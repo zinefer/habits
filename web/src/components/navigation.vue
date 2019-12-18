@@ -54,7 +54,7 @@ export default {
   },
   computed: {
     isLoggedIn: function() {
-      return this.$store.isLoggedIn;
+      return this.$store.getters.isLoggedIn;
     }
   },
   methods: {
