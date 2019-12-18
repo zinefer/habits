@@ -9,17 +9,21 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/zinefer/habits/internal/habits/config"
 )
 
-var listenAddr string
+var (
+	configuration *config.Configuration
+)
 
 func main() {
-	flag.StringVar(&listenAddr, "listen-addr", ":3000", "server listen address")
+	configuration = config.New()
 	flag.Parse()
 
 	r := chi.NewRouter()
 
-	/*r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+	r.Use(middleware.Logger)
 		w.Write([]byte("welcome"))
 	})*/
 
@@ -29,6 +33,8 @@ func main() {
 
 	fmt.Printf("Listening on %s\n", listenAddr)
 	http.ListenAndServe(listenAddr, r)
+	fmt.Printf("Listening on %s\n", configuration.ListenAddress)
+	http.ListenAndServe(configuration.ListenAddress, r)
 }
 
 // FileServer conveniently sets up a http.FileServer handler to serve
