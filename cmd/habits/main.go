@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -10,7 +9,16 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/gorilla/sessions"
+
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/gothic"
+	"github.com/markbates/goth/providers/github"
+	//"github.com/markbates/goth/providers/google"
+	//"github.com/markbates/goth/providers/facebook"
+
 	"github.com/zinefer/habits/internal/habits/config"
+	"github.com/zinefer/habits/internal/habits/controllers/auth"
 )
 
 var (
@@ -19,20 +27,27 @@ var (
 
 func main() {
 	configuration = config.New()
-	flag.Parse()
+
+	gothic.Store = sessions.NewCookieStore([]byte(configuration.SessionSecret))
+
+	goth.UseProviders(
+		github.New(configuration.GithubClientID, configuration.GithubClientSecret, "http://127.0.0.1:3000/auth/github/callback"),
+		//google.New(configuration.GoogleClientID, configuration.GoogleClientSecret, "http://localhost:3000/auth/google/callback"),
+		//facebook.New(configuration.FacebookClientID, configuration.FacebookClientSecret, "http://localhost:3000/auth/facebook/callback"),
+	)
 
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
-		w.Write([]byte("welcome"))
-	})*/
 
 	workDir, _ := os.Getwd()
 	filesDir := filepath.Join(workDir, "web/dist")
 	FileServer(r, "/", http.Dir(filesDir))
 
-	fmt.Printf("Listening on %s\n", listenAddr)
-	http.ListenAndServe(listenAddr, r)
+	r.Get("/auth/{provider}/callback", auth.Callback())
+	r.Get("/auth/{provider}", auth.SignIn())
+	r.Get("/logout/{provider}", auth.SignOut())
+
 	fmt.Printf("Listening on %s\n", configuration.ListenAddress)
 	http.ListenAndServe(configuration.ListenAddress, r)
 }
