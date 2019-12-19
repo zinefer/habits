@@ -1,12 +1,15 @@
 package auth
 
 import (
-	"fmt"
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
+
+	"github.com/zinefer/habits/internal/habits/models/user"
 )
 
 // SignIn initiates an oauth handshake
@@ -41,6 +44,7 @@ func Callback() func(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 
+		saveUserToDatabase(ctx, user)
 		setCurrentUserCookie(res, user.NickName)
 		redirectToIndex(res)
 	}
@@ -51,6 +55,14 @@ func SignOut() func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 		gothic.Logout(res, req)
 		redirectToIndex(res)
+	}
+}
+
+func saveUserToDatabase(ctx context.Context, gu goth.User) {
+	u := user.New(gu.Name, gu.NickName, gu.Email, gu.Provider)
+	_, err := u.Save(ctx)
+	if err != nil {
+		panic(err)
 	}
 }
 

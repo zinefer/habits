@@ -17,13 +17,26 @@ import (
 	//"github.com/markbates/goth/providers/google"
 	//"github.com/markbates/goth/providers/facebook"
 
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
+
 	"github.com/zinefer/habits/internal/habits/config"
+	"github.com/zinefer/habits/internal/habits/middlewares"
 	"github.com/zinefer/habits/internal/habits/controllers/auth"
 )
 
 var (
 	configuration *config.Configuration
+	db *sqlx.DB
 )
+
+var schema = `
+CREATE TABLE users (
+    name text,
+    nickname text,
+	email text,
+	provider text
+);`
 
 func main() {
 	configuration = config.New()
@@ -36,9 +49,18 @@ func main() {
 		//facebook.New(configuration.FacebookClientID, configuration.FacebookClientSecret, "http://localhost:3000/auth/facebook/callback"),
 	)
 
+	db, err := sqlx.Open("postgres", "host=127.0.0.1 user=postgres")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	
+	db.MustExec(schema)
+
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
+	r.Use(middlewares.DbContextMiddleware(db))
 
 	workDir, _ := os.Getwd()
 	filesDir := filepath.Join(workDir, "web/dist")
