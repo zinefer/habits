@@ -8,6 +8,7 @@ import (
 )
 
 type key int
+
 const databaseContextKey key = iota
 
 // DbContextMiddleware is a middleware that adds a database struct to the context

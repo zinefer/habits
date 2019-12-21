@@ -21,13 +21,13 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/zinefer/habits/internal/habits/config"
-	"github.com/zinefer/habits/internal/habits/middlewares"
 	"github.com/zinefer/habits/internal/habits/controllers/auth"
+	"github.com/zinefer/habits/internal/habits/middlewares"
 )
 
 var (
 	configuration *config.Configuration
-	db *sqlx.DB
+	db            *sqlx.DB
 )
 
 var schema = `
@@ -54,7 +54,7 @@ func main() {
 		panic(err)
 	}
 	defer db.Close()
-	
+
 	db.MustExec(schema)
 
 	r := chi.NewRouter()
