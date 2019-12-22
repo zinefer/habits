@@ -2,8 +2,6 @@ package authorize_test
 
 import (
 	"encoding/gob"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,6 +11,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/go-chi/chi"
+	"github.com/zinefer/habits/internal/habits/helpers/test"
 	"github.com/zinefer/habits/internal/habits/middlewares/authorize"
 	"github.com/zinefer/habits/internal/habits/middlewares/session"
 	"github.com/zinefer/habits/internal/habits/models/user"
@@ -50,14 +49,14 @@ func (suite *TestSuite) SetupTest() {
 func (suite *TestSuite) TestAuthorizeMiddleware401() {
 	suite.setupRouter(false)
 
-	resp, _ := testRequest(suite.T(), suite.ts, "GET", "/", nil)
+	resp, _ := test.Request(suite.T(), suite.ts, "GET", "/", nil)
 	assert.Equal(suite.T(), http.StatusUnauthorized, resp.StatusCode)
 }
 
 func (suite *TestSuite) TestAuthorizeMiddleware200() {
 	suite.setupRouter(true)
 
-	resp, body := testRequest(suite.T(), suite.ts, "GET", "/", nil)
+	resp, body := test.Request(suite.T(), suite.ts, "GET", "/", nil)
 	assert.Equal(suite.T(), 200, resp.StatusCode)
 	assert.Equal(suite.T(), "root", body)
 }
@@ -83,27 +82,4 @@ func fakeUserSessionSetterMiddleware() func(next http.Handler) http.Handler {
 
 func TestExampleTestSuite(t *testing.T) {
 	suite.Run(t, new(TestSuite))
-}
-
-func testRequest(t *testing.T, ts *httptest.Server, method, path string, body io.Reader) (*http.Response, string) {
-	req, err := http.NewRequest(method, ts.URL+path, body)
-	if err != nil {
-		t.Fatal(err)
-		return nil, ""
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		t.Fatal(err)
-		return nil, ""
-	}
-
-	respBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatal(err)
-		return nil, ""
-	}
-	defer resp.Body.Close()
-
-	return resp, string(respBody)
 }
