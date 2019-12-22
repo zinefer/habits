@@ -1,4 +1,4 @@
-package middlewares
+package database
 
 import (
 	"context"
@@ -7,9 +7,9 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type key int
+type dbKey int
 
-const databaseContextKey key = iota
+const databaseContextKey dbKey = iota
 
 // DbContextMiddleware is a middleware that adds a database struct to the context
 func DbContextMiddleware(db *sqlx.DB) func(next http.Handler) http.Handler {

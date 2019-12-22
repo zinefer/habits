@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
 	"net/http"
 	"os"
@@ -14,6 +15,7 @@ import (
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/github"
+
 	//"github.com/markbates/goth/providers/google"
 	//"github.com/markbates/goth/providers/facebook"
 
@@ -22,11 +24,15 @@ import (
 
 	"github.com/zinefer/habits/internal/habits/config"
 	"github.com/zinefer/habits/internal/habits/controllers/auth"
-	"github.com/zinefer/habits/internal/habits/middlewares"
+	"github.com/zinefer/habits/internal/habits/middlewares/authorize"
+	"github.com/zinefer/habits/internal/habits/middlewares/database"
+	sessionMW "github.com/zinefer/habits/internal/habits/middlewares/session"
+	"github.com/zinefer/habits/internal/habits/models/user"
 )
 
 var (
 	configuration *config.Configuration
+	session       *sessions.CookieStore
 	db            *sqlx.DB
 )
 
@@ -38,10 +44,15 @@ CREATE TABLE users (
 	provider text
 );`
 
+func init() {
+	gob.Register(&user.User{})
+}
+
 func main() {
 	configuration = config.New()
+	session = sessions.NewCookieStore([]byte(configuration.SessionSecret))
 
-	gothic.Store = sessions.NewCookieStore([]byte(configuration.SessionSecret))
+	gothic.Store = session
 
 	goth.UseProviders(
 		github.New(configuration.GithubClientID, configuration.GithubClientSecret, "http://127.0.0.1:3000/auth/github/callback"),
@@ -55,12 +66,13 @@ func main() {
 	}
 	defer db.Close()
 
-	db.MustExec(schema)
+	//db.MustExec(schema)
 
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
-	r.Use(middlewares.DbContextMiddleware(db))
+	r.Use(database.DbContextMiddleware(db))
+	r.Use(sessionMW.SessionContextMiddleware(session))
 
 	workDir, _ := os.Getwd()
 	filesDir := filepath.Join(workDir, "web/dist")
@@ -69,6 +81,14 @@ func main() {
 	r.Get("/auth/{provider}/callback", auth.Callback())
 	r.Get("/auth/{provider}", auth.SignIn())
 	r.Get("/logout/{provider}", auth.SignOut())
+
+	r.Route("/api", func(r chi.Router) {
+		r.Use(authorize.AuthorizeMiddleware())
+
+		r.Get("/test", func(res http.ResponseWriter, req *http.Request) {
+			res.Write([]byte(fmt.Sprintf("hello")))
+		})
+	})
 
 	fmt.Printf("Listening on %s\n", configuration.ListenAddress)
 	http.ListenAndServe(configuration.ListenAddress, r)

@@ -5,7 +5,7 @@ import (
 
 	"database/sql"
 
-	"github.com/zinefer/habits/internal/habits/middlewares"
+	"github.com/zinefer/habits/internal/habits/middlewares/database"
 )
 
 // User model
@@ -28,6 +28,6 @@ func New(name string, nickname string, email string, provider string) *User {
 
 // Save a User to the database
 func (u *User) Save(ctx context.Context) (sql.Result, error) {
-	db := middlewares.GetDbFromContext(ctx)
+	db := database.GetDbFromContext(ctx)
 	return db.NamedExec("INSERT INTO users (name, nickname, email, provider) VALUES (:name, :nickname, :email, :provider)", u)
 }
