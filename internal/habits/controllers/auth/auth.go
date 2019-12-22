@@ -43,7 +43,7 @@ func Callback() func(res http.ResponseWriter, req *http.Request) {
 			fmt.Fprintln(res, err)
 			return
 		}
-		
+
 		postLogin(ctx, res, req, user)
 	}
 }

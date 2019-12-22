@@ -14,7 +14,7 @@ func AuthorizeMiddleware() func(next http.Handler) http.Handler {
 			session := session.GetSessionFromContext(r.Context())
 			store, _ := session.Get(r, "habits")
 			if user, _ := store.Values["current_user"].(*user.User); user == nil {
-				http.Redirect(w, r, "/", 302)
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			} else {
 				next.ServeHTTP(w, r)
 			}
