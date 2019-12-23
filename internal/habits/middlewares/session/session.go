@@ -22,9 +22,10 @@ func SessionContextMiddleware(session *sessions.CookieStore) func(next http.Hand
 }
 
 // GetSessionFromContext returns the session
-func GetSessionFromContext(ctx context.Context) *sessions.CookieStore {
-	if session, ok := ctx.Value(sessionContextKey).(*sessions.CookieStore); ok {
-		return session
+func GetSessionFromContext(req *http.Request) *sessions.Session {
+	if session, ok := req.Context().Value(sessionContextKey).(*sessions.CookieStore); ok {
+		store, _ := session.Get(req, "habits")
+		return store
 	}
 	panic("Unable to obtain session from context")
 }

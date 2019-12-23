@@ -19,14 +19,15 @@ type TestSuite struct {
 }
 
 func (suite *TestSuite) TestDbContextMiddleware() {
-	os := sessions.NewCookieStore([]byte("sessiontest"))
+	store := sessions.NewCookieStore([]byte("sessiontest"))
+
 	r := chi.NewRouter()
 
-	r.Use(session.SessionContextMiddleware(os))
+	r.Use(session.SessionContextMiddleware(store))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		s := session.GetSessionFromContext(r.Context())
-		assert.Equal(suite.T(), os, s)
+		s := session.GetSessionFromContext(r)
+		assert.IsType(suite.T(), &sessions.Session{}, s)
 	})
 
 	ts := httptest.NewServer(r)

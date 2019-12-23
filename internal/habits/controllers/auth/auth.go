@@ -51,16 +51,13 @@ func Callback() func(res http.ResponseWriter, req *http.Request) {
 // SignOut destroys session
 func SignOut() func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
-		sess := session.GetSessionFromContext(req.Context())
-		store, _ := sess.Get(req, "habits")
-		store.Options.MaxAge = -1
-		store.Save(req, res)
+		sess := session.GetSessionFromContext(req)	
+		sess.Options.MaxAge = -1
+		sess.Save(req, res)
 
-		c := http.Cookie{
-			Name:   "current_user",
-			Path:   "/",
-			MaxAge: -1}
-		http.SetCookie(res, &c)
+		c := makeBasicCurrentUserCookie()
+		c.MaxAge = -1
+		http.SetCookie(res, c)
 
 		gothic.Logout(res, req)
 		redirectToIndex(res)
@@ -83,16 +80,24 @@ func saveUserToDatabase(ctx context.Context, gu goth.User) *user.User {
 	return u
 }
 
+func makeBasicCurrentUserCookie() *http.Cookie {
+	return &http.Cookie{
+		Name:   "current_user",
+		Path:   "/",
+		HttpOnly: false,
+	}
+}
+
 func setCurrentUserCookie(res http.ResponseWriter, user string) {
-	cookie := &http.Cookie{Name: "current_user", Value: user, HttpOnly: false, Path: "/"}
-	http.SetCookie(res, cookie)
+	c := makeBasicCurrentUserCookie()
+	c.Value = user
+	http.SetCookie(res, c)
 }
 
 func setCurrentUserSession(res http.ResponseWriter, req *http.Request, user *user.User) {
-	sess := session.GetSessionFromContext(req.Context())
-	store, _ := sess.Get(req, "habits")
-	store.Values["current_user"] = user
-	err := store.Save(req, res)
+	sess := session.GetSessionFromContext(req)
+	sess.Values["current_user"] = user
+	err := sess.Save(req, res)
 	if err != nil {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 	}

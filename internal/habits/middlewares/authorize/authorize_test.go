@@ -68,10 +68,9 @@ func (suite *TestSuite) TearDownTest() {
 func fakeUserSessionSetterMiddleware() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			sess := session.GetSessionFromContext(r.Context())
-			store, _ := sess.Get(r, "habits")
-			store.Values["current_user"] = &user.User{}
-			err := store.Save(r, w)
+			sess := session.GetSessionFromContext(r)
+			sess.Values["current_user"] = &user.User{}
+			err := sess.Save(r, w)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
