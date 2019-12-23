@@ -16,7 +16,9 @@ git:
   depth: 1
 
 before_script:
-  # Install goveralls to push code coverage to coverage.io
+  # Install coveralls to push lcov code coverage to coverage.io
+  - npm install coveralls
+  # Install goveralls to push golang code coverage to coverage.io
   - go get github.com/mattn/goveralls
   # Install vue-cli-service
   - npm i @vue/cli-service
@@ -28,3 +30,4 @@ script:
   
 after_script:
   - $GOPATH/bin/goveralls -coverprofile=c.out -service=travis-ci
+  - cat ./coverage/lcov.info | coveralls

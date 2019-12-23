@@ -73,7 +73,10 @@
     "preset": "@vue/cli-plugin-unit-jest",
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/web/src/$1"
-    }
+    },
+    "collectCoverage": true,
+    "collectCoverageFrom": ["web/src/**/*.{js,vue}", "!**/node_modules/**"],
+    "coverageReporters": ["lcov", "text-summary"]
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
