@@ -30,4 +30,4 @@ script:
   
 after_script:
   - $GOPATH/bin/goveralls -coverprofile=c.out -service=travis-ci
-  - cat ./coverage/lcov.info | npm run coveralls
+  - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
