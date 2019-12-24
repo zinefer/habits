@@ -80,7 +80,7 @@ func main() {
 
 	r.Get("/auth/{provider}/callback", auth.Callback())
 	r.Get("/auth/{provider}", auth.SignIn())
-	r.Get("/logout/{provider}", auth.SignOut())
+	r.Get("/logout", auth.SignOut())
 
 	r.Route("/api", func(r chi.Router) {
 		r.Use(authorize.AuthorizeMiddleware())

@@ -31,7 +31,7 @@
         </v-btn>
       </template>
       <v-list>
-        <v-list-item @click.stop="">
+        <v-list-item href="/logout">
           <v-list-item-title>Sign out</v-list-item-title>
         </v-list-item>
       </v-list>
