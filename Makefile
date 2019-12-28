@@ -21,7 +21,7 @@ stop: stop-server
 
 start-server:
 	@echo "  >  $(PROJECT) has been started"
-	@$(BIN)/$(PROJECT) 2>&1 & echo $$! > $(PID)
+	@$(BIN)/$(PROJECT) serve 2>&1 & echo $$! > $(PID)
 	@cat $(PID) | sed "/^/s/^/  \>  PID: /"
 
 stop-server:
@@ -52,7 +52,7 @@ clean:
 fmt:
 	GO111MODULE=on go fmt ./...
 
-## compile: Clean and then compile the binary.
+## compile: Clean and then compile for production
 compile: clean install build
 
 ## watch: Run given command when code changes. e.g; make watch run="echo 'hey'"

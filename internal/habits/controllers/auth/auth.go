@@ -51,7 +51,7 @@ func Callback() func(res http.ResponseWriter, req *http.Request) {
 // SignOut destroys session
 func SignOut() func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
-		sess := session.GetSessionFromContext(req)	
+		sess := session.GetSessionFromContext(req)
 		sess.Options.MaxAge = -1
 		sess.Save(req, res)
 
@@ -82,8 +82,8 @@ func saveUserToDatabase(ctx context.Context, gu goth.User) *user.User {
 
 func makeBasicCurrentUserCookie() *http.Cookie {
 	return &http.Cookie{
-		Name:   "current_user",
-		Path:   "/",
+		Name:     "current_user",
+		Path:     "/",
 		HttpOnly: false,
 	}
 }
