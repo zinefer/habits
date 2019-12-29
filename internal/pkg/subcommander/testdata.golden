@@ -1,0 +1,10 @@
+Available subcommands:
+	a	a command
+	a:a	aanother command
+	a:b	abnother command
+	b	b command
+	c	c command
+	c:a	ACommand
+	c:b	Already chewed command
+	c:b:a	CBA Command
+	c:b:b	CBB command
