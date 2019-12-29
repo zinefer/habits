@@ -23,6 +23,8 @@ import (
 	// Postgres driver
 	_ "github.com/lib/pq"
 
+	"github.com/zinefer/habits/internal/pkg/subcommander"
+
 	"github.com/zinefer/habits/internal/habits/config"
 	"github.com/zinefer/habits/internal/habits/controllers/auth"
 	"github.com/zinefer/habits/internal/habits/middlewares/authorize"
@@ -49,8 +51,16 @@ func init() {
 	gob.Register(&user.User{})
 }
 
+// Subcommand for the serve task
+type Subcommand struct{}
+
+// Subcommander configures the subcommander instance for this subtask
+func (*Subcommand) Subcommander() *subcommander.Subcommander {
+	return subcommander.New()
+}
+
 // Run the http server
-func Run() {
+func (c *Subcommand) Run() bool {
 	configuration = config.New()
 
 	session = sessions.NewCookieStore([]byte(configuration.SessionSecret))
@@ -95,6 +105,7 @@ func Run() {
 
 	fmt.Printf("Listening on %s\n", configuration.ListenAddress)
 	http.ListenAndServe(configuration.ListenAddress, r)
+	return true
 }
 
 // FileServer conveniently sets up a http.FileServer handler to serve
