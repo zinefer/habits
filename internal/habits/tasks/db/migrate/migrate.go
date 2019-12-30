@@ -8,7 +8,17 @@ import (
 	"github.com/zinefer/habits/internal/habits/tasks/db/migrate/rollback"
 )
 
-type Subcommand struct{}
+// Subcommand the functionality
+type Subcommand struct {
+	db *sqlx.DB
+}
+
+// New db:migrate subcommand
+func New(db *sqlx.DB) *Subcommand {
+	return &Subcommand{
+		db: db,
+	}
+}
 
 // Subcommander configures the subcommander instance for this subtask
 func (*Subcommand) Subcommander() *subcommander.Subcommander {
