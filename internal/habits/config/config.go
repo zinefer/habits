@@ -6,6 +6,9 @@ import (
 	"io/ioutil"
 )
 
+// DatabaseConfigPath points to the database config yaml
+var DatabaseConfigPath = "database/config.yml"
+
 // Configuration - Application config
 type Configuration struct {
 	ListenAddress string
@@ -41,8 +44,7 @@ func New() *Configuration {
 }
 
 func (c *Configuration) parseDatabaseConfig() {
-	filename := "database/config.yml"
-	source, err := ioutil.ReadFile(filename)
+	source, err := ioutil.ReadFile(DatabaseConfigPath)
 	if err != nil {
 		panic(err)
 	}
