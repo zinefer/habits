@@ -140,6 +140,7 @@ type FakeSubcommandCBB struct{}
 
 func (*FakeSubcommandC) Subcommander() *subcommander.Subcommander {
 	sc := subcommander.New()
+	sc.Hide = true
 	sc.Register("a", "ACommand", &FakeSubcommandCA{})
 	sc.Register("b", "Already chewed command", &FakeSubcommandCB{})
 	return sc

@@ -6,8 +6,12 @@ import (
 	"io/ioutil"
 )
 
-// DatabaseConfigPath points to the database config yaml
-var DatabaseConfigPath = "database/config.yml"
+var (
+	// DatabaseConfigPath points to the database config yaml
+	DatabaseConfigPath = "database/config.yml"
+	// DatabaseSchemaPath points to the database schema sql
+	DatabaseSchemaPath = "database/schema.sql"
+)
 
 // Configuration - Application config
 type Configuration struct {

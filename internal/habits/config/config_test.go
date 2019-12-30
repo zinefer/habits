@@ -45,7 +45,6 @@ func (suite *TestSuite) TestDatabaseConfig() {
 	assert.Equal(suite.T(), expected, config.URI())
 }
 
-
 func TestConfigurationTestSuite(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }

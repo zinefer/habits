@@ -9,12 +9,15 @@ import (
 
 // Subcommander struct has a list of commands
 type Subcommander struct {
+	// Hide this command from the command list (usually used for a group)
+	Hide     bool
 	commands []command
 }
 
 // New returns a pointer to a new subcommander instance
 func New() *Subcommander {
 	return &Subcommander{
+		Hide:     false,
 		commands: make([]command, 0),
 	}
 }
@@ -59,7 +62,9 @@ func printCommandsOnCommander(w *tabwriter.Writer, parent string, c *Subcommande
 		if len(parent) > 0 {
 			name = parent + ":" + name
 		}
-		fmt.Fprintf(w, "\n\t%v\t%v", name, sc.description)
+		if !sc.command.Subcommander().Hide {
+			fmt.Fprintf(w, "\n\t%v\t%v", name, sc.description)
+		}
 		printCommandsOnCommander(w, name, sc.command.Subcommander())
 	}
 }
