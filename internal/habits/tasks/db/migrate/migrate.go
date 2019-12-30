@@ -3,6 +3,7 @@ package migrate
 import (
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/zinefer/habits/internal/pkg/subcommander"
 
 	"github.com/zinefer/habits/internal/habits/tasks/db/migrate/rollback"
