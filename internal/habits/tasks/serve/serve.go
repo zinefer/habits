@@ -52,7 +52,18 @@ func init() {
 }
 
 // Subcommand for the serve task
-type Subcommand struct{}
+type Subcommand struct {
+	config *config.Configuration
+	db     *sqlx.DB
+}
+
+// New serve subcommand
+func New(config *config.Configuration, db *sqlx.DB) *Subcommand {
+	return &Subcommand{
+		config: config,
+		db:     db,
+	}
+}
 
 // Subcommander configures the subcommander instance for this subtask
 func (*Subcommand) Subcommander() *subcommander.Subcommander {
@@ -61,30 +72,22 @@ func (*Subcommand) Subcommander() *subcommander.Subcommander {
 
 // Run the http server
 func (c *Subcommand) Run() bool {
-	configuration = config.New()
-
-	session = sessions.NewCookieStore([]byte(configuration.SessionSecret))
+	session = sessions.NewCookieStore([]byte(c.config.SessionSecret))
 
 	gothic.Store = session
 
 	goth.UseProviders(
-		github.New(configuration.GithubClientID, configuration.GithubClientSecret, "http://127.0.0.1:3000/auth/github/callback"),
+		github.New(c.config.GithubClientID, c.config.GithubClientSecret, "http://127.0.0.1:3000/auth/github/callback"),
 		//google.New(configuration.GoogleClientID, configuration.GoogleClientSecret, "http://localhost:3000/auth/google/callback"),
 		//facebook.New(configuration.FacebookClientID, configuration.FacebookClientSecret, "http://localhost:3000/auth/facebook/callback"),
 	)
-
-	db, err := sqlx.Open("postgres", "host=127.0.0.1 user=postgres")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
 
 	//db.MustExec(schema)
 
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
-	r.Use(database.DbContextMiddleware(db))
+	r.Use(database.DbContextMiddleware(c.db))
 	r.Use(sessionMW.SessionContextMiddleware(session))
 
 	workDir, _ := os.Getwd()
@@ -103,8 +106,8 @@ func (c *Subcommand) Run() bool {
 		})
 	})
 
-	fmt.Printf("Listening on %s\n", configuration.ListenAddress)
-	http.ListenAndServe(configuration.ListenAddress, r)
+	fmt.Printf("Listening on %s\n", c.config.ListenAddress)
+	http.ListenAndServe(c.config.ListenAddress, r)
 	return true
 }
 

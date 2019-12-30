@@ -3,8 +3,11 @@ package main
 import (
 	"os"
 
+	"github.com/jmoiron/sqlx"
+
 	"github.com/zinefer/habits/internal/pkg/subcommander"
 
+	"github.com/zinefer/habits/internal/habits/config"
 	"github.com/zinefer/habits/internal/habits/tasks/db"
 	"github.com/zinefer/habits/internal/habits/tasks/serve"
 )
@@ -19,8 +22,22 @@ func main() {
 		os.Args = append(os.Args[:1], os.Args[2:]...)
 	}
 
+	configuration := config.New()
+
+	database, err := sqlx.Open("postgres", configuration.Database.URI())
+	if err != nil {
+		panic(err)
+	}
+	defer database.Close()
+
 	subcommands := subcommander.New()
-	subcommands.Register("serve", "Serve habits", &serve.Subcommand{})
-	subcommands.Register("db", "Database management", &db.Subcommand{})
-	subcommands.Execute(taskArg)
+	subcommands.Register("serve", "Serve habits", serve.New(configuration, database))
+	subcommands.Register("db", "Database management", db.New(configuration, database))
+	success := subcommands.Execute(taskArg)
+
+	if success {
+		os.Exit(0)
+	} else {
+		os.Exit(1)
+	}
 }
