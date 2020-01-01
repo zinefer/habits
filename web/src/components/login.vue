@@ -45,11 +45,6 @@ export default {
   computed: {
     dialogVisible: {
       get: function() {
-        if (this.show) {
-          // Some dialog initialization code could be placed here
-          // because it is called only when this.dialogVisible changes
-        }
-
         return this.show;
       },
       set: function(value) {
