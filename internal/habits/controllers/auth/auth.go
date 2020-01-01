@@ -80,7 +80,7 @@ func saveUserToDatabase(ctx context.Context, gu goth.User) *user.User {
 		panic(err)
 	}
 
-	_, err = u.Save(ctx)
+	err = u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -129,8 +129,8 @@ func preventNameCollisionsRecursive(ctx context.Context, u *user.User, tries int
 }
 
 func min(x, y int) int {
-    if x < y {
-        return x
-    }
-    return y
+	if x < y {
+		return x
+	}
+	return y
 }
