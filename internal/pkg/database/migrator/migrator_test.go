@@ -98,7 +98,7 @@ func (suite *TestSuite) TestMigrator() {
 
 	// Test stubbing
 	version, err := migrate.StubNewMigration("test")
-	//assert.NoError(suite.T(), err, "Stubbed with no error")
+	assert.NoError(suite.T(), err, "Stubbed with no error")
 
 	folder := version + "_test"
 	testPath := filepath.Join(testMigrations, folder)

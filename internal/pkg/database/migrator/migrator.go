@@ -139,7 +139,7 @@ func (m *SQLMigrator) StubNewMigration(name string) (string, error) {
 		return version, errors.New("Migration already exists")
 	}
 
-	err = os.Mkdir(path, 0666)
+	err = os.Mkdir(path, 0744)
 	if err != nil {
 		return version, err
 	}
