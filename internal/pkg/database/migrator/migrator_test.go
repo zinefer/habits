@@ -100,10 +100,11 @@ func (suite *TestSuite) TestDatabaseManager() {
 	version, err := migrate.StubNewMigration("test")
 	assert.NoError(suite.T(), err, "Stubbed with no error")
 
-	testPath := testMigrations + "/" + version + "_" + "test"
+	folder := version + "_test"
+	testPath := filepath.Join(testMigrations, folder)
 
-	assert.FileExists(suite.T(), testPath+"/up.sql")
-	assert.FileExists(suite.T(), testPath+"/down.sql")
+	assert.FileExists(suite.T(), filepath.Join(testPath, "up.sql"))
+	assert.FileExists(suite.T(), filepath.Join(testPath, "down.sql"))
 
 	err = removeContents(testPath)
 	assert.NoError(suite.T(), err, "Deleted test migration children with no error")

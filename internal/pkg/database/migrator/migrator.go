@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -58,7 +59,7 @@ func (m *SQLMigrator) Migrate() error {
 		if needsRun {
 			fmt.Printf("Executing new migration %v▲\n", name)
 
-			path := fmt.Sprintf("%v/%v/up.sql", m.migrationsPath, name)
+			path := filepath.Join(m.migrationsPath, name, "up.sql")
 			err = dbManager.Load(path)
 			if err != nil {
 				tx.Rollback()
@@ -103,7 +104,7 @@ func (m *SQLMigrator) Rollback() error {
 			fmt.Printf("Rolling back last run migration %v▼\n", file.Name())
 
 			dbManager := manager.New(tx)
-			path := fmt.Sprintf("%v/%v/down.sql", m.migrationsPath, file.Name())
+			path := filepath.Join(m.migrationsPath, file.Name(), "down.sql")
 			err = dbManager.Load(path)
 			if err != nil {
 				tx.Rollback()
@@ -126,7 +127,8 @@ func (m *SQLMigrator) Rollback() error {
 // StubNewMigration creates a migration stub
 func (m *SQLMigrator) StubNewMigration(name string) (string, error) {
 	version := time.Now().Format("20060102150405")
-	path := fmt.Sprintf("%v/%v_%v", m.migrationsPath, version, name)
+	folder := version + "_" + name
+	path := filepath.Join(m.migrationsPath, folder)
 
 	exists, err := exists(path)
 	if err != nil {
@@ -142,12 +144,12 @@ func (m *SQLMigrator) StubNewMigration(name string) (string, error) {
 		return version, err
 	}
 
-	_, err = os.Create(path + "/" + "up.sql")
+	_, err = os.Create(filepath.Join(path, "up.sql"))
 	if err != nil {
 		return version, err
 	}
 
-	_, err = os.Create(path + "/" + "down.sql")
+	_, err = os.Create(filepath.Join(path, "down.sql"))
 	if err != nil {
 		return version, err
 	}
