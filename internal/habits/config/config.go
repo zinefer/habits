@@ -11,6 +11,8 @@ var (
 	DatabaseConfigPath = "database/config.yml"
 	// DatabaseSchemaPath points to the database schema sql
 	DatabaseSchemaPath = "database/schema.sql"
+	// DatabaseMigrationPath points to the database migrations
+	DatabaseMigrationPath = "database/migrations"
 )
 
 // Configuration - Application config

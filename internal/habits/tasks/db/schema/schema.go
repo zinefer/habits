@@ -15,7 +15,7 @@ type Subcommand struct {
 	db     *sqlx.DB
 }
 
-// New db subcommand
+// New db:schema subcommand
 func New(config *config.Configuration, db *sqlx.DB) *Subcommand {
 	return &Subcommand{
 		config: config,
@@ -32,7 +32,7 @@ func (c *Subcommand) Subcommander() *subcommander.Subcommander {
 	return sc
 }
 
-// Run the db subcommand
+// Run the db:schema subcommand
 func (c *Subcommand) Run() bool {
 	sc := c.Subcommander()
 	sc.PrintAvailableCommands("")
