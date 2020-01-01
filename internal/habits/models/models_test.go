@@ -17,7 +17,7 @@ import (
 	"github.com/zinefer/habits/internal/habits/helpers/test"
 	"github.com/zinefer/habits/internal/habits/middlewares/database"
 
-	//"github.com/zinefer/habits/internal/habits/models/activity"
+	"github.com/zinefer/habits/internal/habits/models/activity"
 	"github.com/zinefer/habits/internal/habits/models/habit"
 	"github.com/zinefer/habits/internal/habits/models/user"
 )
