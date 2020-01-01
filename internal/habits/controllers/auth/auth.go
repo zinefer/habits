@@ -9,6 +9,8 @@ import (
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 
+	petname "github.com/dustinkirkland/golang-petname"
+
 	"github.com/zinefer/habits/internal/habits/middlewares/session"
 	"github.com/zinefer/habits/internal/habits/models/user"
 )
@@ -72,8 +74,13 @@ func postLogin(ctx context.Context, res http.ResponseWriter, req *http.Request, 
 }
 
 func saveUserToDatabase(ctx context.Context, gu goth.User) *user.User {
-	u := user.New(gu.Name, gu.NickName, gu.Email, gu.Provider)
-	_, err := u.Save(ctx)
+	u := user.New(gu.UserID, gu.Name, gu.NickName, gu.Email, gu.Provider)
+	err := preventNameCollisions(ctx, u)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -106,4 +113,24 @@ func setCurrentUserSession(res http.ResponseWriter, req *http.Request, user *use
 func redirectToIndex(res http.ResponseWriter) {
 	res.Header().Set("Location", "/")
 	res.WriteHeader(http.StatusTemporaryRedirect)
+}
+
+func preventNameCollisions(ctx context.Context, user *user.User) error {
+	return preventNameCollisionsRecursive(ctx, user, 0)
+}
+
+func preventNameCollisionsRecursive(ctx context.Context, u *user.User, tries int) error {
+	unique, err := user.IsNameAvailable(ctx, u.Name)
+	if !unique || u.Name == "" {
+		u.Name = petname.Generate(min(tries/5, 2), "-")
+		return preventNameCollisionsRecursive(ctx, u, tries+1)
+	}
+	return err
+}
+
+func min(x, y int) int {
+    if x < y {
+        return x
+    }
+    return y
 }
