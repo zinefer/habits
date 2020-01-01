@@ -30,3 +30,11 @@ func (h *Habit) Save(ctx context.Context) error {
 	}
 	return stmt.Get(&h.ID, h)
 }
+
+// FindByID returns a habit by it's ID
+func FindByID(ctx context.Context, habitID int64) (*Habit, error) {
+	habit := &Habit{}
+	db := database.GetDbFromContext(ctx)
+	err := db.Get(habit, "SELECT * FROM habits WHERE id = $1 LIMIT 1", habitID)
+	return habit, err
+}

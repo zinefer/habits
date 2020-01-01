@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 
 	"github.com/zinefer/habits/internal/pkg/subcommander"
 

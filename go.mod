@@ -6,6 +6,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.3.3
 	github.com/dustinkirkland/golang-petname v0.0.0-20191129215211-8e5a1ed0cff0
 	github.com/go-chi/chi v4.0.2+incompatible
+	github.com/go-chi/render v1.0.1
 	github.com/gorilla/sessions v1.1.1
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/lib/pq v1.0.0
