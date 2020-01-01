@@ -2,14 +2,13 @@ package user
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/zinefer/habits/internal/habits/middlewares/database"
 )
 
 // User model
 type User struct {
-	ID         int
+	ID         int64
 	ProviderID string `db:"provider_id"`
 	Provider   string
 	Name       string
@@ -21,17 +20,29 @@ type User struct {
 func New(providerID string, provider string, name string, realname string, email string) *User {
 	return &User{
 		ProviderID: providerID,
-		Provider: provider,
-		Name:     name,
-		RealName: realname,
-		Email:    email,
+		Provider:   provider,
+		Name:       name,
+		RealName:   realname,
+		Email:      email,
 	}
 }
 
 // Save a User to the database
-func (u *User) Save(ctx context.Context) (sql.Result, error) {
+func (u *User) Save(ctx context.Context) error {
 	db := database.GetDbFromContext(ctx)
-	return db.NamedExec("INSERT INTO users (provider_id, provider, name, real_name, email) VALUES (:provider_id, :provider, :name, :real_name, :email)", u)
+	stmt, err := db.PrepareNamed("INSERT INTO users (provider_id, provider, name, real_name, email) VALUES (:provider_id, :provider, :name, :real_name, :email) RETURNING id")
+	if err != nil {
+		return err
+	}
+	return stmt.Get(&u.ID, u)
+}
+
+// FindByID returns a user by it's ID
+func FindByID(ctx context.Context, userID int64) (*User, error) {
+	user := &User{}
+	db := database.GetDbFromContext(ctx)
+	err := db.Get(user, "SELECT * FROM users WHERE id = $1 LIMIT 1", userID)
+	return user, err
 }
 
 // IsNameAvailable checks to see if a username is already in use
