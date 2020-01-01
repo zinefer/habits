@@ -8,11 +8,11 @@ import (
 
 // DatabaseManager manages databases
 type DatabaseManager struct {
-	db *sqlx.DB
+	db sqlx.Execer
 }
 
 // New DatabaseManager
-func New(db *sqlx.DB) *DatabaseManager {
+func New(db sqlx.Execer) *DatabaseManager {
 	return &DatabaseManager{
 		db: db,
 	}
@@ -36,7 +36,6 @@ func (m *DatabaseManager) Load(filePath string) error {
 	if err != nil {
 		return err
 	}
-
 	_, err = m.db.Exec(string(data))
 	return err
 }

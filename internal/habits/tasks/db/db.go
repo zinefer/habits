@@ -34,7 +34,7 @@ func (c *Subcommand) Subcommander() *subcommander.Subcommander {
 	sc := subcommander.New()
 	sc.Register("create", "Creates the database for current environment", create.New(c.config, c.db))
 	sc.Register("drop", "Drops the database for current environment", drop.New(c.config, c.db))
-	sc.Register("migrate", "Runs migrations for the current environment that have not run yet", migrate.New(c.db))
+	sc.Register("migrate", "Runs migrations for the current environment that have not run yet", migrate.New(c.config, c.db))
 	sc.Register("schema", "Database schema subcommand group", schema.New(c.config, c.db))
 	return sc
 }

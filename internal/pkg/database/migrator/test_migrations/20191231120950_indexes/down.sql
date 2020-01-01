@@ -1,0 +1,2 @@
+DROP INDEX idx_account_last_login;
+DROP INDEX idx_account_last_login_two;
