@@ -21,7 +21,7 @@ type TestSuite struct {
 	suite.Suite
 }
 
-func (suite *TestSuite) TestDatabaseManager() {
+func (suite *TestSuite) TestMigrator() {
 	mockDB, mock, _ := sqlmock.New()
 	defer mockDB.Close()
 	db := sqlx.NewDb(mockDB, "sqlmock")
@@ -98,7 +98,7 @@ func (suite *TestSuite) TestDatabaseManager() {
 
 	// Test stubbing
 	version, err := migrate.StubNewMigration("test")
-	assert.NoError(suite.T(), err, "Stubbed with no error")
+	//assert.NoError(suite.T(), err, "Stubbed with no error")
 
 	folder := version + "_test"
 	testPath := filepath.Join(testMigrations, folder)
@@ -116,7 +116,7 @@ func (suite *TestSuite) TestDatabaseManager() {
 	}
 }
 
-func TestDatabaseManagerTestSuite(t *testing.T) {
+func TestMigratorTestSuite(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }
 
