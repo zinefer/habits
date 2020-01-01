@@ -126,7 +126,7 @@ func (m *SQLMigrator) Rollback() error {
 // StubNewMigration creates a migration stub
 func (m *SQLMigrator) StubNewMigration(name string) (string, error) {
 	version := time.Now().Format("20060102150405")
-	path := m.migrationsPath + "/" + version + "_" + name
+	path := fmt.Sprintf("%v/%v_%v", m.migrationsPath, version, name)
 
 	exists, err := exists(path)
 	if err != nil {
@@ -137,7 +137,7 @@ func (m *SQLMigrator) StubNewMigration(name string) (string, error) {
 		return version, errors.New("Migration already exists")
 	}
 
-	err = os.Mkdir(path, 0644)
+	err = os.Mkdir(path, 0666)
 	if err != nil {
 		return version, err
 	}
