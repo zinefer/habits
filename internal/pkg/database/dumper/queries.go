@@ -8,8 +8,7 @@ column_default as default, is_nullable as nullable,
 character_maximum_length as limit FROM 
 information_schema.columns WHERE table_name = $1;`
 
-const getConstraintsQuery =
-`SELECT c.conname                                     AS constraint_name,
+const getConstraintsQuery = `SELECT c.conname                                     AS constraint_name,
        c.contype                                     AS constraint_type,
        sch.nspname                                   AS "schema",
        tbl.relname                                   AS "table",
