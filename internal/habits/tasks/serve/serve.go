@@ -20,14 +20,11 @@ import (
 	//"github.com/markbates/goth/providers/facebook"
 
 	"github.com/jmoiron/sqlx"
-	// Postgres driver
-	_ "github.com/lib/pq"
 
 	"github.com/zinefer/habits/internal/pkg/subcommander"
 
 	"github.com/zinefer/habits/internal/habits/config"
-	"github.com/zinefer/habits/internal/habits/controllers/auth"
-	"github.com/zinefer/habits/internal/habits/middlewares/authorize"
+	"github.com/zinefer/habits/internal/habits/config/routes"
 	"github.com/zinefer/habits/internal/habits/middlewares/database"
 	sessionMW "github.com/zinefer/habits/internal/habits/middlewares/session"
 	"github.com/zinefer/habits/internal/habits/models/user"
@@ -94,17 +91,7 @@ func (c *Subcommand) Run() bool {
 	filesDir := filepath.Join(workDir, "web/dist")
 	FileServer(r, "/", http.Dir(filesDir))
 
-	r.Get("/auth/{provider}/callback", auth.Callback())
-	r.Get("/auth/{provider}", auth.SignIn())
-	r.Get("/logout", auth.SignOut())
-
-	r.Route("/api", func(r chi.Router) {
-		r.Use(authorize.AuthorizeMiddleware())
-
-		r.Get("/test", func(res http.ResponseWriter, req *http.Request) {
-			res.Write([]byte(fmt.Sprintf("hello")))
-		})
-	})
+	routes.Define(r)
 
 	fmt.Printf("Listening on %s\n", c.config.ListenAddress)
 	http.ListenAndServe(c.config.ListenAddress, r)
