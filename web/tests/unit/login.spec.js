@@ -1,5 +1,5 @@
 import { shallowMount } from "@vue/test-utils";
-import Login from "@/components/login.vue";
+import Login from "@/components/dialog/login.vue";
 
 describe("Login dialog", () => {
   let wrapper;

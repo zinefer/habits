@@ -36,20 +36,32 @@
         </v-list-item>
       </v-list>
     </v-menu>
+
+    <template v-slot:extension v-if="isLoggedIn">
+      <v-fab-transition>
+        <v-btn v-show="!hidden" color="secondary" fab absolute bottom>
+          <v-icon>mdi-checkerboard-plus</v-icon>
+        </v-btn>
+      </v-fab-transition>
+    </template>
+    <NewHabit :show="showNewHabit" @close="newHabitClose" />
   </v-app-bar>
 </template>
 
 <script>
-import Login from "@/components/login.vue";
+import Login from "@/components/dialogs/login.vue";
+import NewHabit from "@/components/dialogs/login.vue";
 
 export default {
   name: "Navigation",
   components: {
-    Login
+    Login,
+    NewHabit
   },
   data: function() {
     return {
-      showLogin: false
+      showLogin: false,
+      showNewHabit: false
     };
   },
   computed: {
@@ -60,6 +72,9 @@ export default {
   methods: {
     loginClose() {
       this.showLogin = false;
+    },
+    newHabitClose() {
+      this.showNewHabit = false;
     }
   }
 };
