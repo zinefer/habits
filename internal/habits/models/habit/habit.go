@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/zinefer/habits/internal/habits/middlewares/database"
+
+	"github.com/zinefer/habits/internal/habits/models/activity"
 )
 
 // Habit model
@@ -47,6 +49,16 @@ func (h *Habit) Delete(ctx context.Context) error {
 	db := database.GetDbFromContext(ctx)
 	_, err := db.Exec("DELETE FROM habits WHERE id = $1 LIMIT 1", h.ID)
 	return err
+}
+
+// CountActivitiesInLastYear counts the activities in the past year
+func (h *Habit) CountActivitiesInLastYear(ctx context.Context) ([]*activity.ActivityCount, error) {
+	return activity.CountByDayInLastYearByHabit(ctx, h.ID)
+}
+
+// GetActivities returns a list of habits for a user
+func (h *Habit) GetActivities(ctx context.Context) ([]*activity.Activity, error) {
+	return activity.FindAllByHabit(ctx, h.ID)
 }
 
 // FindAllByUser returns a list of habits owned by a user
