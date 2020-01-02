@@ -31,6 +31,32 @@ func (h *Habit) Save(ctx context.Context) error {
 	return stmt.Get(&h.ID, h)
 }
 
+// Update a Habit in the database
+func (h *Habit) Update(ctx context.Context) error {
+	db := database.GetDbFromContext(ctx)
+	stmt, err := db.PrepareNamed("UPDATE habits SET user_id = :user_id, created = :created WHERE id = :id LIMIT 1")
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(h)
+	return err
+}
+
+// Delete a Habit from the database
+func (h *Habit) Delete(ctx context.Context) error {
+	db := database.GetDbFromContext(ctx)
+	_, err := db.Exec("DELETE FROM habits WHERE id = $1 LIMIT 1", h.ID)
+	return err
+}
+
+// FindAllByUser returns a list of habits owned by a user
+func FindAllByUser(ctx context.Context, userID int64) ([]*Habit, error) {
+	db := database.GetDbFromContext(ctx)
+	habits := []*Habit{}
+	err := db.Select(&habits, "SELECT * FROM habits WHERE user_id = $1", userID)
+	return habits, err
+}
+
 // FindByID returns a habit by it's ID
 func FindByID(ctx context.Context, habitID int64) (*Habit, error) {
 	habit := &Habit{}

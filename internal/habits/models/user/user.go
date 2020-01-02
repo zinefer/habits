@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/zinefer/habits/internal/habits/middlewares/database"
+
+	"github.com/zinefer/habits/internal/habits/models/habit"
 )
 
 // User model
@@ -35,6 +37,11 @@ func (u *User) Save(ctx context.Context) error {
 		return err
 	}
 	return stmt.Get(&u.ID, u)
+}
+
+// GetHabits returns a list of habits for a user
+func (u *User) GetHabits(ctx context.Context) ([]*habit.Habit, error) {
+	return habit.FindAllByUser(ctx, u.ID)
 }
 
 // FindByID returns a user by it's ID

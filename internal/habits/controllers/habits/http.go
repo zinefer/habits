@@ -3,6 +3,8 @@ package habits
 import (
 	"net/http"
 
+	"github.com/go-chi/render"
+
 	"github.com/zinefer/habits/internal/habits/models/habit"
 )
 
@@ -29,4 +31,13 @@ func NewHabitResponse(habit *habit.Habit) *HabitResponse {
 // Render a HabitResponse
 func (hr *HabitResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
+}
+
+// NewHabitListResponse returns a new NewHabitListResponse
+func NewHabitListResponse(habits []*habit.Habit) []render.Renderer {
+	list := []render.Renderer{}
+	for _, habit := range habits {
+		list = append(list, NewHabitResponse(habit))
+	}
+	return list
 }
