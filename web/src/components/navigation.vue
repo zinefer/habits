@@ -41,8 +41,8 @@
     <template v-slot:extension v-if="!isLoggedIn">
       <v-fab-transition>
         <v-btn
-          color="secondary"
           @click.stop="showNewHabit = true"
+          color="secondary"
           fab
           absolute
           bottom

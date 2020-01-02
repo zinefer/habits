@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <svg class="calendar-wrapper" :height="8 * squareSize">
+  <div ref="calendar">
+    <svg class="calendar-wrapper" :height="8 * squareSize - squareSize * 0.8">
       <!-- <g class="cal-months" v-for="(month, i) in ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']" :key="month">
         <text
           fill="#000000"
@@ -1765,9 +1765,7 @@ export default {
     this.values = data.data.user.contributionsCollection.contributionCalendar.weeks.slice(
       53 - this.months * 4
     );
-    this.squareSize =
-      document.getElementById("github-stats").offsetWidth / this.values.length -
-      1;
+    this.squareSize = this.$refs.calendar.offsetWidth / this.values.length - 1;
   }
 };
 </script>

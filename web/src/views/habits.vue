@@ -5,7 +5,9 @@
         <v-col cols="12">
           <v-card>
             <v-card-title>Coding</v-card-title>
-            <Calendar></Calendar>
+            <v-card-text>
+              <Calendar></Calendar>
+            </v-card-text>
             <v-fab-transition>
               <v-btn color="secondary" fab dark absolute bottom right>
                 <v-icon>mdi-plus-box</v-icon>
