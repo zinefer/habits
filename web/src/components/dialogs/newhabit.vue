@@ -1,9 +1,7 @@
 <template>
-  <v-dialog v-model="dialogVisible" max-width="290">
+  <v-dialog v-model="dialogVisible" max-width="700">
     <v-card>
-      <v-card-title>
-        <span class="headline">User Profile</span>
-      </v-card-title>
+      <v-card-title class="headline justify-center">User Profile</v-card-title>
       <v-card-text>
         <v-container>
           <v-row>
@@ -73,7 +71,7 @@
 
 <script>
 export default {
-  name: "New Habit",
+  name: "NewHabit",
   props: ["show"],
   computed: {
     dialogVisible: {

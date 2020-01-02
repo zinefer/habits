@@ -20,6 +20,7 @@
     <v-btn color="secondary" @click.stop="showLogin = true" v-if="!isLoggedIn">
       Sign in
     </v-btn>
+
     <Login :show="showLogin" @close="loginClose" />
 
     <v-menu offset-y v-if="isLoggedIn">
@@ -37,20 +38,27 @@
       </v-list>
     </v-menu>
 
-    <template v-slot:extension v-if="isLoggedIn">
+    <template v-slot:extension v-if="!isLoggedIn">
       <v-fab-transition>
-        <v-btn v-show="!hidden" color="secondary" fab absolute bottom>
+        <v-btn
+          color="secondary"
+          @click.stop="showNewHabit = true"
+          fab
+          absolute
+          bottom
+        >
           <v-icon>mdi-checkerboard-plus</v-icon>
         </v-btn>
       </v-fab-transition>
     </template>
+
     <NewHabit :show="showNewHabit" @close="newHabitClose" />
   </v-app-bar>
 </template>
 
 <script>
 import Login from "@/components/dialogs/login.vue";
-import NewHabit from "@/components/dialogs/login.vue";
+import NewHabit from "@/components/dialogs/newhabit.vue";
 
 export default {
   name: "Navigation",
