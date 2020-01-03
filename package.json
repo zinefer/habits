@@ -10,6 +10,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "axios": "^0.19.0",
     "core-js": "^3.4.3",
     "js-cookie": "^2.2.1",
     "vue": "^2.6.10",
@@ -75,8 +76,14 @@
       "^@/(.*)$": "<rootDir>/web/src/$1"
     },
     "collectCoverage": true,
-    "collectCoverageFrom": ["web/src/**/*.{js,vue}", "!**/node_modules/**"],
-    "coverageReporters": ["lcov", "text-summary"]
+    "collectCoverageFrom": [
+      "web/src/**/*.{js,vue}",
+      "!**/node_modules/**"
+    ],
+    "coverageReporters": [
+      "lcov",
+      "text-summary"
+    ]
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
