@@ -14,6 +14,7 @@ CREATE TABLE users (
 CREATE TABLE habits (
     id      SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id),
+    name    TEXT NOT NULL,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -24,7 +24,7 @@ func Create() func(res http.ResponseWriter, req *http.Request) {
 		sess := session.GetSessionFromContext(req)
 		currentUser := sess.Values["current_user"].(*user.User)
 
-		habit := habit.New(currentUser.ID)
+		habit := habit.New(currentUser.ID, data.Name)
 		habit.Save(req.Context())
 
 		render.Status(req, http.StatusCreated)

@@ -2,6 +2,7 @@ package habit
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/zinefer/habits/internal/habits/middlewares/database"
@@ -13,20 +14,22 @@ import (
 type Habit struct {
 	ID      int64
 	UserID  int64 `db:"user_id"`
+	Name    string
 	Created time.Time
 }
 
 // New Creates a Habit model
-func New(userID int64) *Habit {
+func New(userID int64, name string) *Habit {
 	return &Habit{
 		UserID: userID,
+		Name: name,
 	}
 }
 
 // Save a Habit to the database
 func (h *Habit) Save(ctx context.Context) error {
 	db := database.GetDbFromContext(ctx)
-	stmt, err := db.PrepareNamed("INSERT INTO habits (user_id, created) VALUES (:user_id, :created) RETURNING id")
+	stmt, err := db.PrepareNamed("INSERT INTO habits (user_id, name, created) VALUES (:user_id, :name, :created) RETURNING id")
 	if err != nil {
 		return err
 	}
@@ -36,7 +39,7 @@ func (h *Habit) Save(ctx context.Context) error {
 // Update a Habit in the database
 func (h *Habit) Update(ctx context.Context) error {
 	db := database.GetDbFromContext(ctx)
-	stmt, err := db.PrepareNamed("UPDATE habits SET user_id = :user_id, created = :created WHERE id = :id LIMIT 1")
+	stmt, err := db.PrepareNamed("UPDATE habits SET user_id = :user_id, name = :name, created = :created WHERE id = :id LIMIT 1")
 	if err != nil {
 		return err
 	}
@@ -65,6 +68,7 @@ func (h *Habit) GetActivities(ctx context.Context) ([]*activity.Activity, error)
 func FindAllByUser(ctx context.Context, userID int64) ([]*Habit, error) {
 	db := database.GetDbFromContext(ctx)
 	habits := []*Habit{}
+	fmt.Println("SELECT * FROM habits WHERE user_id = $1", userID)
 	err := db.Select(&habits, "SELECT * FROM habits WHERE user_id = $1", userID)
 	return habits, err
 }
