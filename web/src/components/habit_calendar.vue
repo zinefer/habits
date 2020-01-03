@@ -43,8 +43,12 @@ const DEFAULT_RANGE_COLOR = [
 ];
 
 export default {
-  name: "calendar",
+  name: "HabitCalendar",
   props: {
+    habit_id: {
+      type: Number,
+      required: true
+    },
     rangeColors: {
       type: Array,
       default: () => DEFAULT_RANGE_COLOR

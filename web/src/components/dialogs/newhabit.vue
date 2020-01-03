@@ -6,7 +6,7 @@
         <v-container>
           <v-row>
             <v-col cols="12">
-              <v-text-field label="Title*" required></v-text-field>
+              <v-text-field label="Name*" required></v-text-field>
             </v-col>
           </v-row>
         </v-container>

@@ -9,7 +9,7 @@
           class="mb-2"
           color="#444444"
           dark
-          href="/auth/github"
+          href="/api/auth/github"
         >
           <v-icon class="pr-2">mdi-github-circle</v-icon>
           Continue with GitHub
@@ -19,7 +19,7 @@
           class="mb-2"
           color="#DD4B39"
           dark
-          href="/auth/google"
+          href="/api/auth/google"
         >
           <v-icon class="pr-2">mdi-google</v-icon>
           Continue with Google
@@ -28,7 +28,7 @@
           @click="dialog = false"
           color="#3B5998"
           dark
-          href="/auth/facebook"
+          href="/api/auth/facebook"
         >
           <v-icon class="pr-1">mdi-facebook-box</v-icon>
           Continue with Facebook

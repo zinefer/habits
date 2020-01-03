@@ -32,15 +32,16 @@
         </v-btn>
       </template>
       <v-list>
-        <v-list-item href="/logout">
+        <v-list-item href="/api/logout">
           <v-list-item-title>Sign out</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-menu>
 
-    <template v-slot:extension v-if="!isLoggedIn">
+    <template v-slot:extension v-if="isLoggedIn">
       <v-fab-transition>
         <v-btn
+          ref="add_habit"
           @click.stop="showNewHabit = true"
           color="secondary"
           fab
@@ -72,6 +73,7 @@ export default {
       showNewHabit: false
     };
   },
+  created() {},
   computed: {
     isLoggedIn: function() {
       return this.$store.getters.isLoggedIn;
