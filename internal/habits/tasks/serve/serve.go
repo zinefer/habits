@@ -74,9 +74,9 @@ func (c *Subcommand) Run() bool {
 	gothic.Store = session
 
 	goth.UseProviders(
-		github.New(c.config.GithubClientID, c.config.GithubClientSecret, "http://127.0.0.1:3000/auth/github/callback"),
-		//google.New(configuration.GoogleClientID, configuration.GoogleClientSecret, "http://localhost:3000/auth/google/callback"),
-		//facebook.New(configuration.FacebookClientID, configuration.FacebookClientSecret, "http://localhost:3000/auth/facebook/callback"),
+		github.New(c.config.GithubClientID, c.config.GithubClientSecret, "http://127.0.0.1:3000/api/auth/github/callback"),
+		//google.New(configuration.GoogleClientID, configuration.GoogleClientSecret, "http://localhost:3000/api/auth/google/callback"),
+		//facebook.New(configuration.FacebookClientID, configuration.FacebookClientSecret, "http://localhost:3000/api/auth/facebook/callback"),
 	)
 
 	//db.MustExec(schema)
@@ -86,10 +86,13 @@ func (c *Subcommand) Run() bool {
 	r.Use(middleware.Logger)
 	r.Use(database.DbContextMiddleware(c.db))
 	r.Use(sessionMW.SessionContextMiddleware(session))
+	r.Use(rerouteToIndexOn404)
+
+	routes.Define(r)
 
 	workDir, _ := os.Getwd()
 	filesDir := filepath.Join(workDir, "web/dist")
-	FileServer(r, "/", http.Dir(filesDir))
+	FileServer(r, "/", filesDir)
 
 	routes.Define(r)
 
@@ -100,20 +103,57 @@ func (c *Subcommand) Run() bool {
 
 // FileServer conveniently sets up a http.FileServer handler to serve
 // static files from a http.FileSystem.
-func FileServer(r chi.Router, path string, root http.FileSystem) {
+func FileServer(r chi.Router, path string, filesDir string) {
 	if strings.ContainsAny(path, "{}*") {
 		panic("FileServer does not permit URL parameters.")
 	}
 
+	root := http.Dir(filesDir)
 	fs := http.StripPrefix(path, http.FileServer(root))
+	err := filepath.Walk(filesDir, func(path string, f os.FileInfo, err error) error {
+		if f.IsDir() {
+			return nil
+		}
+		
+		path, err = filepath.Rel(filesDir, path)
+		if err != nil {
+			panic(err)
+		}
 
-	if path != "/" && path[len(path)-1] != '/' {
-		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)
-		path += "/"
+		r.Get("/" + path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			fs.ServeHTTP(w, r)
+		}))
+
+		return err
+	})
+
+	if err != nil {
+		panic(err)
 	}
-	path += "*"
 
-	r.Get(path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fs.ServeHTTP(w, r)
 	}))
+}
+
+func rerouteToIndexOn404(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		rctx := chi.RouteContext(r.Context())
+		routePath := rctx.RoutePath
+		if routePath == "" {
+			if r.URL.RawPath != "" {
+				routePath = r.URL.RawPath
+			} else {
+				routePath = r.URL.Path
+			}
+		}
+
+		tctx := chi.NewRouteContext()
+		if !rctx.Routes.Match(tctx, r.Method, routePath) {
+			r.URL.Path = "/"
+			rctx.RoutePath = "/"
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

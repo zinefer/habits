@@ -1,3 +1,4 @@
+import Cookies from "js-cookie";
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
@@ -8,13 +9,19 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
-    name: "home",
-    component: Home
+    name: "Home",
+    component: Home,
+    meta: {
+      redirectHabitsIfAuthed: true
+    }
   },
   {
     path: "/habits",
-    name: "habits",
-    component: Habits
+    name: "Habits",
+    component: Habits,
+    meta: {
+      requiresAuth: true
+    }
   }
 ];
 
@@ -22,6 +29,28 @@ const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes
+});
+
+router.beforeEach((to, from, next) => {
+  var loggedIn = Cookies.get("current_user") != null;
+
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!loggedIn) {
+      next({
+        path: "/"
+      });
+    }
+  }
+
+  if (to.matched.some(record => record.meta.redirectHabitsIfAuthed)) {
+    if (!loggedIn) {
+      next({
+        path: "/habits"
+      });
+    }
+  }
+
+  next();
 });
 
 export default router;
