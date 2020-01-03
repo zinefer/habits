@@ -44,6 +44,14 @@ func (u *User) GetHabits(ctx context.Context) ([]*habit.Habit, error) {
 	return habit.FindAllByUser(ctx, u.ID)
 }
 
+// FindByProviderID returns a user by it's provider and providerID
+func FindByProviderID(ctx context.Context, provider string, providerID string) (*User, error) {
+	user := &User{}
+	db := database.GetDbFromContext(ctx)
+	err := db.Get(user, "SELECT * FROM users WHERE provider = $1 AND provider_ID = $2 LIMIT 1", provider, providerID)
+	return user, err
+}
+
 // FindByID returns a user by it's ID
 func FindByID(ctx context.Context, userID int64) (*User, error) {
 	user := &User{}

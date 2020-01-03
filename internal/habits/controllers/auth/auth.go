@@ -25,7 +25,12 @@ func SignIn() func(res http.ResponseWriter, req *http.Request) {
 
 		// try to get the user without re-authenticating
 		if gothUser, err := gothic.CompleteUserAuth(res, req); err == nil {
-			postLogin(ctx, res, req, gothUser)
+			u, _ := user.FindByProviderID(req.Context(), gothUser.Provider, gothUser.UserID)
+			if u.ID == 0 {
+				u = addUserToDatabase(ctx, gothUser)
+			}
+
+			postLogin(ctx, res, req, u)
 		} else {
 			gothic.BeginAuthHandler(res, req)
 		}
@@ -40,13 +45,18 @@ func Callback() func(res http.ResponseWriter, req *http.Request) {
 		ctx := context.WithValue(req.Context(), gothic.ProviderParamKey, provider)
 		req = req.WithContext(ctx)
 
-		user, err := gothic.CompleteUserAuth(res, req)
+		gothUser, err := gothic.CompleteUserAuth(res, req)
 		if err != nil {
 			fmt.Fprintln(res, err)
 			return
 		}
 
-		postLogin(ctx, res, req, user)
+		u, _ := user.FindByProviderID(req.Context(), gothUser.Provider, gothUser.UserID)
+		if u.ID == 0 {
+			u = addUserToDatabase(ctx, gothUser)
+		}
+
+		postLogin(ctx, res, req, u)
 	}
 }
 
@@ -66,14 +76,13 @@ func SignOut() func(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func postLogin(ctx context.Context, res http.ResponseWriter, req *http.Request, user goth.User) {
-	u := saveUserToDatabase(ctx, user)
+func postLogin(ctx context.Context, res http.ResponseWriter, req *http.Request, u *user.User) {
 	setCurrentUserSession(res, req, u)
-	setCurrentUserCookie(res, user.NickName)
+	setCurrentUserCookie(res, u.Name)
 	redirectToIndex(res)
 }
 
-func saveUserToDatabase(ctx context.Context, gu goth.User) *user.User {
+func addUserToDatabase(ctx context.Context, gu goth.User) *user.User {
 	u := user.New(gu.UserID, gu.Name, gu.NickName, gu.Email, gu.Provider)
 	err := preventNameCollisions(ctx, u)
 	if err != nil {
