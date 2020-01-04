@@ -80,7 +80,6 @@ export default {
   methods: {
     color(count) {
       if (count == 0) return this.rangeColors[0];
-      //var index = Math.round((count + (this.max * 0.25) / this.max) * 4)
       var index = Math.round((count / this.max) * 4);
       if (index < 1) return this.rangeColors[1];
       if (index > 4) return this.rangeColors[4];
@@ -103,7 +102,7 @@ export default {
         });
 
         var len = sorted.length;
-        this.max = sorted[Math.round(len * 0.95)];
+        this.max = sorted[Math.round(len * 0.95) - 1];
       })
       .finally(() => {
         this.loading = false;
