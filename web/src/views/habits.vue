@@ -1,11 +1,11 @@
 <template>
   <v-container>
     <v-row dense>
-      <v-col cols="12" v-for="habit in habits" :key="habit.id">
+      <v-col cols="12" v-for="habit in habits" :key="habit.ID">
         <v-card>
           <v-card-title>{{ habit.Name }}</v-card-title>
           <v-card-text>
-            <HabitCalendar :habit_id="habit.id" />
+            <HabitCalendar :habitID="habit.ID" />
           </v-card-text>
           <v-fab-transition>
             <v-btn color="secondary" fab dark absolute bottom right>

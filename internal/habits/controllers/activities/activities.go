@@ -1,6 +1,7 @@
 package activities
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/render"
@@ -21,6 +22,7 @@ func ListLastYear() func(res http.ResponseWriter, req *http.Request) {
 		habit := habitMW.GetHabitFromContext(req)
 		activities, err := habit.CountActivitiesInLastYear(req.Context())
 		if err != nil {
+			fmt.Println(err);
 			http.Error(res, http.StatusText(400), 400)
 			return
 		}

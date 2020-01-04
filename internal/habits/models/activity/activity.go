@@ -24,7 +24,7 @@ func New(habitID int64) *Activity {
 // Save an Activity to the database
 func (a *Activity) Save(ctx context.Context) error {
 	db := database.GetDbFromContext(ctx)
-	stmt, err := db.PrepareNamed("INSERT INTO activities (habit_id) VALUES (:habit_id) RETURNING id")
+	stmt, err := db.PrepareNamed("INSERT INTO activities (habit_id) VALUES (:habit_id) RETURNING id;")
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (a *Activity) Save(ctx context.Context) error {
 func FindAllByHabit(ctx context.Context, habitID int64) ([]*Activity, error) {
 	db := database.GetDbFromContext(ctx)
 	activities := []*Activity{}
-	err := db.Select(&activities, "SELECT * FROM activities WHERE habit_id = $1", habitID)
+	err := db.Select(&activities, "SELECT * FROM activities WHERE habit_id = $1;", habitID)
 	return activities, err
 }
 
@@ -49,14 +49,18 @@ type ActivityCount struct {
 func CountByDayInLastYearByHabit(ctx context.Context, habitID int64) ([]*ActivityCount, error) {
 	db := database.GetDbFromContext(ctx)
 	counts := []*ActivityCount{}
-	err := db.Select(&counts, `SELECT day, sum(count) as count FROM (
+	err := db.Select(&counts, `WITH date_range AS (
+		SELECT date_trunc('day', now() - (364 + extract(dow from now())) * interval '1 day') as beginning,
+			   date_trunc('day', now()) as ending
+	)
+	SELECT day, sum(count) as count FROM (
 		SELECT date_trunc('day', activities.created)::date as "day", count(*) as count
 		FROM activities
-		WHERE activities.created >= now() - interval '1 year' AND habit_id = $1
+		WHERE activities.created >= (select beginning from date_range) AND habit_id = $1
 		GROUP BY day
 		UNION
 		SELECT day::date, 0 as count
-		FROM generate_series((now() - interval '1 year'), now(), '1 day') day
+		FROM generate_series((select beginning from date_range), (select ending from date_range), '1 day') day
 	) as activities GROUP BY day ORDER BY day`, habitID)
 	return counts, err
 }
