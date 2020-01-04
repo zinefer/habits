@@ -101,7 +101,7 @@ func (suite *TestSuite) TestHabit() {
 		u := user.New("2", "test", "habiter", "quitin", "quitin@fillory.com")
 		u.Save(r.Context())
 
-		h := habit.New(u.ID)
+		h := habit.New(u.ID, "habit testing")
 		err := h.Save(r.Context())
 		assert.NoError(suite.T(), err, "Saved habit with no errors")
 	})
@@ -115,7 +115,7 @@ func (suite *TestSuite) TestActivity() {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		u := user.New("3", "test", "activiter", "elliot", "elliot@fillory.com")
 		u.Save(r.Context())
-		h := habit.New(u.ID)
+		h := habit.New(u.ID, "habit testing")
 		h.Save(r.Context())
 
 		a := activity.New(h.ID)
