@@ -1,13 +1,6 @@
 <template>
   <div ref="calendar">
     <svg class="calendar-wrapper" :height="7 * (squareSize + 1) + headerHeight">
-      <!-- <g class="cal-months" v-for="(month, i) in ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']" :key="month">
-        <text
-          fill="#000000"
-          :y="1.25 * squareSize"
-          :x="(i * 2 * (squareSize + 1)) + (squareSize + 1)">{{ month }}</text>
-      </g> -->
-
       <g
         class="calendar-dow"
         v-for="(dayName, dow) in ['Mon', 'Wed', 'Fri']"
@@ -31,45 +24,27 @@
         <g v-for="(day, d) in values.slice(w * 7, w * 7 + 7)" :key="day.Day">
           <rect
             class="calendar-day"
+            :day="day.Day"
             :id="day.Day"
             :style="{ fill: color(day.Count) }"
             :width="squareSize"
             :height="squareSize"
             :x="w * squareSize + w + squareSize"
             :y="d * (squareSize + 1) + headerHeight"
+            v-on:mouseover="showDayTooltip"
+            v-on:mouseleave="hideDayTooltip"
           />
           <text
             v-if="isSecondSundayOfMonth(day.Day)"
             text-anchor="middle"
             fill="#ccc"
-            :x="w * squareSize + w + squareSize / 2 - 2"
+            :x="w * squareSize + w + squareSize + squareSize / 2"
             :y="textHeight"
           >
             {{ getMonthName(day.Day) }}
           </text>
         </g>
       </g>
-
-      <!--<g class="calendar-week" v-for="(week, i) in values" :key="i">
-        <rect
-          class="calendar-day"
-          v-for="(day, j) in week.contributionDays"
-          :key="j"
-          :style="{ fill: rangeColors[contribCount(day.contributionCount)] }"
-          :width="squareSize"
-          :height="squareSize"
-          :x="i * (squareSize + 1)"
-          :y="j * (squareSize + 1)"
-        />
-      </g>-->
-      <!-- <g class="calendar-legend" :y="9 * squareSize">
-        <rect v-for="(color, i) in rangeColors" :key="color"
-          :style="{fill: color}"
-          :width="squareSize"
-          :height="squareSize"
-          :x="i * (squareSize + 1)"
-        /> 
-      </g> -->
     </svg>
   </div>
 </template>
@@ -115,7 +90,6 @@ export default {
   data() {
     return {
       max: 1,
-      groups: [],
       values: [],
       squareSize: 0,
       headerHeight: 20,
@@ -130,7 +104,25 @@ export default {
       if (index > 4) return this.rangeColors[4];
       return this.rangeColors[index];
     },
+    showDayTooltip(event) {
+      var transform = event.currentTarget.getBoundingClientRect();
+      var date = event.currentTarget.getAttribute("day").split("T")[0];
+      date = new Date(date)
+        .toUTCString()
+        .split(" ")
+        .slice(0, 4)
+        .join(" ");
+      this.$emit("showTooltip", {
+        top: transform.top - 75,
+        left: transform.left,
+        text: date
+      });
+    },
+    hideDayTooltip() {
+      this.$emit("hideTooltip");
+    },
     isSecondSundayOfMonth(date) {
+      date = date.split("T")[0];
       date = new Date(date);
       var day = date.getUTCDate();
       date.setDate(7);
@@ -163,7 +155,8 @@ export default {
       });
 
     this.squareSize = this.$refs.calendar.offsetWidth / 56;
-  }
+  },
+  created() {}
 };
 </script>
 

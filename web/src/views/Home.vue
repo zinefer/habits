@@ -18,6 +18,10 @@
           <p class="subheading font-weight-regular">
             This website can help track streaks in your habits.
           </p>
+          <p class="caption">
+            Made with <v-icon color="red" small>mdi-heart</v-icon> on
+            <a href="github.com/zinefer/habits">Github</a>
+          </p>
         </v-flex>
       </v-layout>
     </v-container>
