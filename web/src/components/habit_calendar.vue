@@ -1,6 +1,6 @@
 <template>
   <div ref="calendar">
-    <svg class="calendar-wrapper" :height="8 * squareSize - squareSize * 0.8">
+    <svg class="calendar-wrapper" :height="7 * (squareSize + 1) + headerHeight">
       <!-- <g class="cal-months" v-for="(month, i) in ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']" :key="month">
         <text
           fill="#000000"
@@ -8,18 +8,46 @@
           :x="(i * 2 * (squareSize + 1)) + (squareSize + 1)">{{ month }}</text>
       </g> -->
 
-      <g class="calendar-week" v-for="(week, i) in 53" :key="i">
-        <rect
-          class="calendar-day"
-          v-for="(day, j) in values.slice(i * 7, i * 7 + 7)"
-          :id="day.Day"
-          :key="j"
-          :style="{ fill: color(day.Count) }"
-          :width="squareSize"
-          :height="squareSize"
-          :x="i * (squareSize + 1)"
-          :y="j * (squareSize + 1)"
-        />
+      <g
+        class="calendar-dow"
+        v-for="(dayName, dow) in ['Mon', 'Wed', 'Fri']"
+        :key="dayName"
+      >
+        <text
+          text-anchor="middle"
+          fill="#ccc"
+          :x="squareSize / 2 - 2"
+          :y="
+            2 * dow * (squareSize + 1) +
+              headerHeight +
+              textHeight * 1.4 +
+              squareSize
+          "
+        >
+          {{ dayName }}
+        </text>
+      </g>
+      <g class="calendar-week" v-for="(week, w) in 53" :key="w">
+        <g v-for="(day, d) in values.slice(w * 7, w * 7 + 7)" :key="day.Day">
+          <rect
+            class="calendar-day"
+            :id="day.Day"
+            :style="{ fill: color(day.Count) }"
+            :width="squareSize"
+            :height="squareSize"
+            :x="w * squareSize + w + squareSize"
+            :y="d * (squareSize + 1) + headerHeight"
+          />
+          <text
+            v-if="isSecondSundayOfMonth(day.Day)"
+            text-anchor="middle"
+            fill="#ccc"
+            :x="w * squareSize + w + squareSize / 2 - 2"
+            :y="textHeight"
+          >
+            {{ getMonthName(day.Day) }}
+          </text>
+        </g>
       </g>
 
       <!--<g class="calendar-week" v-for="(week, i) in values" :key="i">
@@ -57,6 +85,21 @@ const DEFAULT_RANGE_COLOR = [
   "#196127" // 11+
 ];
 
+const months = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec"
+];
+
 export default {
   name: "HabitCalendar",
   props: {
@@ -74,7 +117,9 @@ export default {
       max: 1,
       groups: [],
       values: [],
-      squareSize: 0
+      squareSize: 0,
+      headerHeight: 20,
+      textHeight: 16
     };
   },
   methods: {
@@ -84,6 +129,16 @@ export default {
       if (index < 1) return this.rangeColors[1];
       if (index > 4) return this.rangeColors[4];
       return this.rangeColors[index];
+    },
+    isSecondSundayOfMonth(date) {
+      date = new Date(date);
+      var day = date.getUTCDate();
+      date.setDate(7);
+      date.setDate(7 + 7 - date.getUTCDay());
+      return date.getUTCDate() == day;
+    },
+    getMonthName(date) {
+      return months[date.split("-")[1] - 1];
     }
   },
   mounted() {
@@ -92,7 +147,7 @@ export default {
         this.values = resp.data;
 
         var filtered = this.values
-          .filter(value => value.Count > 1)
+          .filter(value => value.Count > 0)
           .map(function(value) {
             return value.Count;
           });
@@ -101,14 +156,13 @@ export default {
           return a - b;
         });
 
-        var len = sorted.length;
-        this.max = sorted[Math.round(len * 0.95) - 1];
+        this.max = sorted[Math.round(sorted.length * 0.95) - 1];
       })
       .finally(() => {
         this.loading = false;
       });
 
-    this.squareSize = this.$refs.calendar.offsetWidth / 55;
+    this.squareSize = this.$refs.calendar.offsetWidth / 56;
   }
 };
 </script>
