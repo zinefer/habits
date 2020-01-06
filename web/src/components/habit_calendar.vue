@@ -1,51 +1,63 @@
 <template>
   <div ref="calendar">
-    <svg class="calendar-wrapper" :height="7 * (squareSize + 1) + headerHeight">
-      <g
-        class="calendar-dow"
-        v-for="(dayName, dow) in ['Mon', 'Wed', 'Fri']"
-        :key="dayName"
+    <v-scale-transition hide-on-leave>
+      <v-skeleton-loader
+        v-if="loading"
+        class="loader"
+        :transition="scale - transition"
+        type="heading, avatar@132"
+      ></v-skeleton-loader>
+      <svg
+        class="calendar-wrapper"
+        :height="7 * (squareSize + 1) + headerHeight"
+        v-else
       >
-        <text
-          text-anchor="middle"
-          fill="#ccc"
-          :x="squareSize / 2 - 2"
-          :y="
-            2 * dow * (squareSize + 1) +
-              headerHeight +
-              textHeight * 1.4 +
-              squareSize
-          "
+        <g
+          class="calendar-dow"
+          v-for="(dayName, dow) in ['Mon', 'Wed', 'Fri']"
+          :key="dayName"
         >
-          {{ dayName }}
-        </text>
-      </g>
-      <g class="calendar-week" v-for="(week, w) in 53" :key="w">
-        <g v-for="(day, d) in values.slice(w * 7, w * 7 + 7)" :key="day.Day">
-          <rect
-            class="calendar-day"
-            :day="day.Day"
-            :id="day.Day"
-            :style="{ fill: color(day.Count) }"
-            :width="squareSize"
-            :height="squareSize"
-            :x="w * squareSize + w + squareSize"
-            :y="d * (squareSize + 1) + headerHeight"
-            v-on:mouseover="showDayTooltip"
-            v-on:mouseleave="hideDayTooltip"
-          />
           <text
-            v-if="isSecondSundayOfMonth(day.Day)"
             text-anchor="middle"
             fill="#ccc"
-            :x="w * squareSize + w + squareSize + squareSize / 2"
-            :y="textHeight"
+            :x="squareSize / 2 - 2"
+            :y="
+              2 * dow * (squareSize + 1) +
+                headerHeight +
+                textHeight * 1.4 +
+                squareSize
+            "
           >
-            {{ getMonthName(day.Day) }}
+            {{ dayName }}
           </text>
         </g>
-      </g>
-    </svg>
+        <g class="calendar-week" v-for="(week, w) in 53" :key="w">
+          <g v-for="(day, d) in values.slice(w * 7, w * 7 + 7)" :key="day.Day">
+            <rect
+              class="calendar-day"
+              :day="day.Day"
+              :count="day.Count"
+              :style="{ fill: color(day.Count) }"
+              :width="squareSize"
+              :height="squareSize"
+              :x="w * squareSize + w + squareSize"
+              :y="d * (squareSize + 1) + headerHeight"
+              v-on:mouseover="showDayTooltip"
+              v-on:mouseleave="hideDayTooltip"
+            />
+            <text
+              v-if="isSecondSundayOfMonth(day.Day)"
+              text-anchor="middle"
+              fill="#ccc"
+              :x="w * squareSize + w + squareSize + squareSize / 2"
+              :y="textHeight"
+            >
+              {{ getMonthName(day.Day) }}
+            </text>
+          </g>
+        </g>
+      </svg>
+    </v-scale-transition>
   </div>
 </template>
 
@@ -93,7 +105,8 @@ export default {
       values: [],
       squareSize: 0,
       headerHeight: 20,
-      textHeight: 16
+      textHeight: 16,
+      loading: true
     };
   },
   methods: {
@@ -107,15 +120,17 @@ export default {
     showDayTooltip(event) {
       var transform = event.currentTarget.getBoundingClientRect();
       var date = event.currentTarget.getAttribute("day").split("T")[0];
+
       date = new Date(date)
         .toUTCString()
         .split(" ")
         .slice(0, 4)
         .join(" ");
+
       this.$emit("showTooltip", {
         top: transform.top - 75,
         left: transform.left,
-        text: date
+        text: date + ": " + event.currentTarget.getAttribute("count")
       });
     },
     hideDayTooltip() {
@@ -155,19 +170,28 @@ export default {
       });
 
     this.squareSize = this.$refs.calendar.offsetWidth / 56;
-  },
-  created() {}
+  }
 };
 </script>
 
 <style lang="scss">
-#github-stats {
-  width: 90%;
+.loader {
+  .v-skeleton-loader__heading {
+    margin-bottom: 10px;
+  }
+  .v-skeleton-loader__avatar {
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    height: 42px;
+    width: 42px;
+  }
 }
+
 .calendar-wrapper {
   width: 100%;
-  // border: 1px solid black;
-
+  margin-bottom: 25px;
   .calendar-legend {
     margin-top: 50%;
   }
