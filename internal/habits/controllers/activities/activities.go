@@ -7,12 +7,30 @@ import (
 	"github.com/go-chi/render"
 
 	habitMW "github.com/zinefer/habits/internal/habits/middlewares/habit"
+
+	"github.com/zinefer/habits/internal/habits/models/activity"
 )
 
 // Create an activity for a habit
 func Create() func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
+		data := &ActivityRequest{}
+		if err := render.Bind(req, data); err != nil {
+			http.Error(res, http.StatusText(400), 400)
+			return
+		}
 
+		habit := habitMW.GetHabitFromContext(req)
+
+		activity := activity.New(habit.ID)
+		err := activity.Save(req.Context())
+		if err != nil {
+			fmt.Println(err);
+			http.Error(res, http.StatusText(400), 400)
+			return
+		}
+
+		render.Status(req, http.StatusCreated)
 	}
 }
 

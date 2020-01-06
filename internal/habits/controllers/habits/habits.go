@@ -1,6 +1,7 @@
 package habits
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/render"
@@ -25,7 +26,10 @@ func Create() func(res http.ResponseWriter, req *http.Request) {
 		currentUser := sess.Values["current_user"].(*user.User)
 
 		habit := habit.New(currentUser.ID, data.Name)
-		habit.Save(req.Context())
+		if err := habit.Save(req.Context()); err != nil {
+			http.Error(res, http.StatusText(400), 400)
+			return
+		}
 
 		render.Status(req, http.StatusCreated)
 		render.Render(res, req, NewHabitResponse(habit))
@@ -56,6 +60,7 @@ func List() func(res http.ResponseWriter, req *http.Request) {
 
 		habits, err := currentUser.GetHabits(req.Context())
 		if err != nil {
+			fmt.Println(err)
 			http.Error(res, http.StatusText(400), 400)
 			return
 		}
