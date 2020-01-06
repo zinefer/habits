@@ -43,7 +43,7 @@ router.beforeEach((to, from, next) => {
   }
 
   if (to.matched.some(record => record.meta.redirectHabitsIfAuthed)) {
-    if (!loggedIn) {
+    if (loggedIn) {
       next({
         path: "/habits"
       });
