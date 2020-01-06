@@ -21,18 +21,25 @@ func Define(r *chi.Mux) {
 		r.Route("/habits", func(r chi.Router) {
 			r.Use(authorize.AuthorizeMiddleware())
 
-			r.Get("/{id}", habits.Show())
 			r.Get("/", habits.List())
 			r.Post("/", habits.Create())
-			r.Patch("/{id}", habits.Update())
-			r.Delete("/{id}", habits.Delete())
+			r.Route("/{id}", func(r chi.Router) {
+				r.Use(habit.HabitContextMiddleware())
 
+				r.Get("/{id}", habits.Show())
+
+				rHO := r.With(habit.HabitOwnerMiddleware())
+				rHO.Patch("/{id}", habits.Update())
+				rHO.Delete("/{id}", habits.Delete())
+			})
 			r.Route("/{habit_id}/activities", func(r chi.Router) {
 				r.Use(habit.HabitContextMiddleware())
 
 				r.Get("/", activities.ListLastYear())
-				r.Post("/", activities.Create())
-				r.Delete("/{id}", activities.Delete())
+
+				rHO := r.With(habit.HabitOwnerMiddleware())
+				rHO.Post("/", activities.Create())
+				rHO.Delete("/{id}", activities.Delete())
 			})
 		})
 	})
