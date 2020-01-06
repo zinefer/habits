@@ -10,7 +10,7 @@ export default {
   },
   create(habit_id) {
     return axios
-      .post("/api/habits" + habit_id + "/activities")
+      .post("/api/habits/" + habit_id + "/activities", {})
       .catch(error => konsole.log(error));
   }
 };
