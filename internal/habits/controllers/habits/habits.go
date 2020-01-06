@@ -95,6 +95,7 @@ func Delete() func(res http.ResponseWriter, req *http.Request) {
 
 		err := habit.Delete(req.Context())
 		if err != nil {
+			fmt.Println(err)
 			http.Error(res, http.StatusText(400), 400)
 			return
 		}

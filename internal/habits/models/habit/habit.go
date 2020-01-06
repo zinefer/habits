@@ -29,7 +29,7 @@ func New(userID int64, name string) *Habit {
 // Save a Habit to the database
 func (h *Habit) Save(ctx context.Context) error {
 	db := database.GetDbFromContext(ctx)
-	stmt, err := db.PrepareNamed("INSERT INTO habits (user_id, name, created) VALUES (:user_id, :name, :created) RETURNING id")
+	stmt, err := db.PrepareNamed("INSERT INTO habits (user_id, name, created) VALUES (:user_id, :name, :created) RETURNING id;")
 	if err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func (h *Habit) Save(ctx context.Context) error {
 // Update a Habit in the database
 func (h *Habit) Update(ctx context.Context) error {
 	db := database.GetDbFromContext(ctx)
-	stmt, err := db.PrepareNamed("UPDATE habits SET user_id = :user_id, name = :name, created = :created WHERE id = :id LIMIT 1")
+	stmt, err := db.PrepareNamed("UPDATE habits SET user_id = :user_id, name = :name, created = :created WHERE id = :id LIMIT 1;")
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,11 @@ func (h *Habit) Update(ctx context.Context) error {
 // Delete a Habit from the database
 func (h *Habit) Delete(ctx context.Context) error {
 	db := database.GetDbFromContext(ctx)
-	_, err := db.Exec("DELETE FROM habits WHERE id = $1 LIMIT 1", h.ID)
+	err := activity.DeleteAllByHabit(ctx, h.ID)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("DELETE FROM habits WHERE id = $1;", h.ID)
 	return err
 }
 
@@ -68,8 +72,8 @@ func (h *Habit) GetActivities(ctx context.Context) ([]*activity.Activity, error)
 func FindAllByUser(ctx context.Context, userID int64) ([]*Habit, error) {
 	db := database.GetDbFromContext(ctx)
 	habits := []*Habit{}
-	fmt.Println("SELECT * FROM habits WHERE user_id = $1", userID)
-	err := db.Select(&habits, "SELECT * FROM habits WHERE user_id = $1", userID)
+	fmt.Println("SELECT * FROM habits WHERE user_id = $1;", userID)
+	err := db.Select(&habits, "SELECT * FROM habits WHERE user_id = $1;", userID)
 	return habits, err
 }
 
@@ -77,6 +81,6 @@ func FindAllByUser(ctx context.Context, userID int64) ([]*Habit, error) {
 func FindByID(ctx context.Context, habitID int64) (*Habit, error) {
 	habit := &Habit{}
 	db := database.GetDbFromContext(ctx)
-	err := db.Get(habit, "SELECT * FROM habits WHERE id = $1 LIMIT 1", habitID)
+	err := db.Get(habit, "SELECT * FROM habits WHERE id = $1 LIMIT 1;", habitID)
 	return habit, err
 }

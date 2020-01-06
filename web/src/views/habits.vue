@@ -2,13 +2,7 @@
   <v-container>
     <v-row dense>
       <v-col cols="12">
-        <HabitCard
-          v-for="habit in habits"
-          :key="habit.ID"
-          :habit="habit"
-          v-on:showTooltip="showTooltip"
-          v-on:hideTooltip="hideTooltip"
-        />
+        <HabitCard v-for="habit in habits" :key="habit.ID" :habit="habit" />
       </v-col>
     </v-row>
   </v-container>

@@ -39,6 +39,12 @@ func FindAllByHabit(ctx context.Context, habitID int64) ([]*Activity, error) {
 	return activities, err
 }
 
+func DeleteAllByHabit(ctx context.Context, habitID int64) error {
+	db := database.GetDbFromContext(ctx)
+	_, err := db.Exec("DELETE FROM activities WHERE habit_id = $1;", habitID)
+	return err
+}
+
 // ActivityCount model
 type ActivityCount struct {
 	Day   time.Time
@@ -61,6 +67,6 @@ func CountByDayInLastYearByHabit(ctx context.Context, habitID int64) ([]*Activit
 		UNION
 		SELECT day::date, 0 as count
 		FROM generate_series((select beginning from date_range), (select ending from date_range), '1 day') day
-	) as activities GROUP BY day ORDER BY day`, habitID)
+	) as activities GROUP BY day ORDER BY day;`, habitID)
 	return counts, err
 }

@@ -26,11 +26,11 @@ func Define(r *chi.Mux) {
 			r.Route("/{id}", func(r chi.Router) {
 				r.Use(habit.HabitContextMiddleware())
 
-				r.Get("/{id}", habits.Show())
+				r.Get("/", habits.Show())
 
 				rHO := r.With(habit.HabitOwnerMiddleware())
-				rHO.Patch("/{id}", habits.Update())
-				rHO.Delete("/{id}", habits.Delete())
+				rHO.Patch("/", habits.Update())
+				rHO.Delete("/", habits.Delete())
 			})
 			r.Route("/{habit_id}/activities", func(r chi.Router) {
 				r.Use(habit.HabitContextMiddleware())

@@ -1,8 +1,36 @@
 <template>
-  <div class="mb-6">
-    <v-card>
+  <div class="mb-8">
+    <v-card style="position:relative">
+      <v-speed-dial
+        style="left:-20px;top:10px"
+        absolute
+        v-model="optionsOpen"
+        direction="left"
+        transition="slide-x-reverse-transition"
+        fab
+      >
+        <template v-slot:activator>
+          <v-btn v-model="optionsOpen" color="primary" fab small>
+            <v-icon v-if="optionsOpen">mdi-close</v-icon>
+            <v-icon v-else>mdi-settings</v-icon>
+          </v-btn>
+        </template>
+        <v-btn fab dark small color="green">
+          <v-icon>mdi-pencil</v-icon>
+        </v-btn>
+        <v-btn
+          fab
+          dark
+          small
+          color="red"
+          @click="deleteHabit"
+          :loading="deleting"
+        >
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </v-speed-dial>
       <v-card-title>
-        <span>{{ habit.Name }}</span>
+        <span class="pl-3">{{ habit.Name }}</span>
       </v-card-title>
       <v-card-text>
         <v-scale-transition hide-on-leave>
@@ -34,6 +62,7 @@
 </template>
 
 <script>
+import HabitsApi from "@/services/habits";
 import ActivitiesApi from "@/services/activities";
 import Skeleton from "@/components/skeleton.vue";
 import HabitCalendar from "@/components/habit/calendar.vue";
@@ -46,6 +75,8 @@ export default {
   data() {
     return {
       loading: true,
+      deleting: false,
+      optionsOpen: false,
       addingNew: false,
       activities: []
     };
@@ -71,6 +102,20 @@ export default {
         })
         .finally(() => {
           this.loading = false;
+        });
+    },
+    deleteHabit() {
+      this.deleting = true;
+      HabitsApi.delete(this.habit.ID)
+        .then(resp => {
+          if (resp.status == 200) {
+            EventBus.$emit("reloadHabits");
+          } else {
+            alert("Error deleting habit");
+          }
+        })
+        .finally(() => {
+          this.deleting = false;
         });
     },
     showTooltip(event) {

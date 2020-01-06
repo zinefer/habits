@@ -28,7 +28,7 @@
 <script>
 import HabitsApi from "@/services/habits";
 
-import { EventBus } from "@/main";
+import { EventBus } from "@/event_bus";
 
 export default {
   name: "NewHabit",
