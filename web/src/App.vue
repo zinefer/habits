@@ -15,7 +15,7 @@
 <script>
 import Navigation from "@/components/navigation.vue";
 
-import { EventBus } from "@/main";
+import { EventBus } from "@/event_bus";
 
 export default {
   mounted() {

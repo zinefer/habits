@@ -19,7 +19,7 @@ import HabitsApi from "@/services/habits";
 
 import HabitCard from "@/components/habit/card.vue";
 
-import { EventBus } from "@/main";
+import { EventBus } from "@/event_bus";
 
 export default {
   name: "Habits",

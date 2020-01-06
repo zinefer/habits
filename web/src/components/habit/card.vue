@@ -38,7 +38,7 @@ import ActivitiesApi from "@/services/activities";
 import Skeleton from "@/components/skeleton.vue";
 import HabitCalendar from "@/components/habit/calendar.vue";
 
-import { EventBus } from "@/main";
+import { EventBus } from "@/event_bus";
 
 export default {
   name: "HabitCard",

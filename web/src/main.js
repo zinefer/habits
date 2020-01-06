@@ -9,8 +9,6 @@ axios.defaults.baseURL = "http://127.0.0.1:3000";
 
 Vue.config.productionTip = false;
 
-export const EventBus = new Vue();
-
 new Vue({
   vuetify,
   router,
