@@ -38,6 +38,7 @@ func Define(r *chi.Mux) {
 				r.Use(habit.HabitContextMiddleware())
 
 				r.Get("/", activities.ListLastYear())
+				r.Get("/streaks", activities.Streaks())
 
 				rHO := r.With(habit.HabitOwnerMiddleware())
 				rHO.Post("/", activities.Create())

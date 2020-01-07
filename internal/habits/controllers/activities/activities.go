@@ -52,6 +52,22 @@ func ListLastYear() func(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// Streaks of activities for a habit
+func Streaks() func(res http.ResponseWriter, req *http.Request) {
+	return func(res http.ResponseWriter, req *http.Request) {
+		habit := habitMW.GetHabitFromContext(req)
+
+		streak, err := habit.GetStreaks(req.Context())
+		if err != nil {
+			fmt.Println(err);
+			http.Error(res, http.StatusText(400), 400)
+			return
+		}
+
+		render.Render(res, req, NewActivityStreaksResponse(streak))
+	}
+}
+
 // Delete an activity for a habit
 func Delete() func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {

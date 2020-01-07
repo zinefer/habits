@@ -63,6 +63,11 @@ func (h *Habit) CountActivitiesInLastYear(ctx context.Context) ([]*activity.Acti
 	return activity.CountByDayInLastYearByHabit(ctx, h.ID)
 }
 
+// GetStreaks returns activity streaks
+func (h *Habit) GetStreaks(ctx context.Context) (*activity.ActivityStreaks, error) {
+	return activity.GetStreaksByHabit(ctx, h.ID)
+}
+
 // GetActivities returns a list of habits for a user
 func (h *Habit) GetActivities(ctx context.Context) ([]*activity.Activity, error) {
 	return activity.FindAllByHabit(ctx, h.ID)

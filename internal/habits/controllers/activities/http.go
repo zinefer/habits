@@ -41,3 +41,18 @@ func NewActivityCountListResponse(activitys []*activity.ActivityCount) []render.
 	}
 	return list
 }
+
+// ActivityStreaksResponse is the response payload for the Activity streak data model
+type ActivityStreaksResponse struct {
+	*activity.ActivityStreaks
+}
+
+// Render a HabitResponse
+func (hr *ActivityStreaksResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+// NewActivityStreaksResponse returns a new ActivityStreaksResponse
+func NewActivityStreaksResponse(streaks *activity.ActivityStreaks) *ActivityStreaksResponse {
+	return &ActivityStreaksResponse{ActivityStreaks: streaks}
+}

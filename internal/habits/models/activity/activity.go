@@ -2,6 +2,7 @@ package activity
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/zinefer/habits/internal/habits/middlewares/database"
@@ -39,6 +40,7 @@ func FindAllByHabit(ctx context.Context, habitID int64) ([]*Activity, error) {
 	return activities, err
 }
 
+// DeleteAllByHabit removes activities from a habit
 func DeleteAllByHabit(ctx context.Context, habitID int64) error {
 	db := database.GetDbFromContext(ctx)
 	_, err := db.Exec("DELETE FROM activities WHERE habit_id = $1;", habitID)
@@ -69,4 +71,65 @@ func CountByDayInLastYearByHabit(ctx context.Context, habitID int64) ([]*Activit
 		FROM generate_series((select beginning from date_range), (select ending from date_range), '1 day') day
 	) as activities GROUP BY day ORDER BY day;`, habitID)
 	return counts, err
+}
+
+// ActivityStreak model
+type ActivityStreak struct {
+	Streak    int
+	MinDate   time.Time
+	MaxDate   time.Time
+}
+
+// ActivityStreaks model
+type ActivityStreaks struct {
+	Longest *ActivityStreak
+	Current *ActivityStreak
+}
+
+// GetStreaksByHabit returns a habits streaks
+func GetStreaksByHabit(ctx context.Context, habitID int64) (*ActivityStreaks, error) {
+	db := database.GetDbFromContext(ctx)
+	streaks := &ActivityStreaks{}
+	tx, err := db.Begin()
+	if err != nil {
+		return streaks, err
+	}
+
+	_, err = tx.Exec(`WITH groups(date, grp) AS (
+		SELECT 
+		  DISTINCT created::date, 
+		  EXTRACT(epoch from created::date)::int / 86400 - DENSE_RANK() OVER (ORDER BY created::date) AS grp
+		FROM activities
+		WHERE habit_id = $1
+	  )
+	  SELECT
+		COUNT(*) AS streak,
+		MIN(date) as minDate,
+		MAX(date) as maxDate
+	  INTO TEMPORARY TABLE streaks
+	  FROM groups
+	  GROUP BY grp;`, habitID)
+	
+	  if err != nil {
+		return streaks, err
+	}
+
+	longest, _ := makeStreakSubquery(tx, "SELECT * FROM streaks ORDER BY streak DESC, minDate DESC LIMIT 1")
+	current, _ := makeStreakSubquery(tx, "SELECT * FROM streaks WHERE maxDate = now()::date LIMIT 1")
+	tx.Rollback()
+
+	streaks.Longest = longest
+	streaks.Current = current
+	return streaks, err
+}
+
+func makeStreakSubquery(tx *sql.Tx, query string) (*ActivityStreak, error) {
+	streak := &ActivityStreak{}
+	row := tx.QueryRow(query)
+	err := row.Scan(&streak.Streak, &streak.MinDate, &streak.MaxDate)
+	if err != nil {
+		return streak, err
+	}
+
+	return streak, err
 }

@@ -221,7 +221,11 @@ export default {
       if (this.isMobile) {
         var today = new Date();
         return this.values.slice(
-          this.values.length - (this.displayedWeeks - 1) * 7 - today.getUTCDay()
+          this.values.length +
+            1 -
+            this.displayedWeeks * 7 +
+            today.getUTCDay() +
+            1
         );
       }
       return this.values;

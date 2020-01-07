@@ -1,7 +1,7 @@
 <template>
   <v-card style="position:relative">
     <v-speed-dial
-      style="left:-20px;top:10px"
+      class="options"
       absolute
       v-model="optionsOpen"
       :direction="speedDialDirection"
@@ -28,8 +28,33 @@
         <v-icon>mdi-delete</v-icon>
       </v-btn>
     </v-speed-dial>
-    <v-card-title>
-      <span class="pl-3">{{ habit.Name }}</span>
+    <v-card-title class="pb-2">
+      <v-container fluid dense class="pa-0">
+        <v-row dense>
+          <span class="pl-4 col-sm-8">{{ habit.Name }}</span>
+          <v-spacer />
+          <div
+            :class="{ 'cols-sm-2': true, streak: true, mobile: this.isMobile }"
+          >
+            <template v-if="streaks == null">
+              <Skeleton type="text" width="75" class="pushdown" />
+              <div class="divider" />
+              <Skeleton type="text" width="75" class="pushdown" />
+            </template>
+            <template v-else>
+              <span
+                >{{ streaks.Longest.Streak }} Day <br />
+                Longest Streak</span
+              >
+              <div class="divider" />
+              <span
+                >{{ streaks.Current.Streak }} Day <br />
+                Current Streak</span
+              >
+            </template>
+          </div>
+        </v-row>
+      </v-container>
     </v-card-title>
     <v-card-text>
       <v-scale-transition hide-on-leave>
@@ -77,7 +102,8 @@ export default {
       deleting: false,
       optionsOpen: false,
       addingNew: false,
-      activities: []
+      activities: [],
+      streaks: null
     };
   },
   computed: {
@@ -92,14 +118,14 @@ export default {
       ActivitiesApi.create(this.habit.ID)
         .then(resp => {
           if (resp.status == 200) {
-            this.getActivities();
+            this.loadData();
           }
         })
         .finally(() => {
           this.addingNew = false;
         });
     },
-    getActivities() {
+    loadData() {
       ActivitiesApi.get(this.habit.ID)
         .then(resp => {
           this.activities = resp.data;
@@ -107,6 +133,10 @@ export default {
         .finally(() => {
           this.loading = false;
         });
+
+      ActivitiesApi.streaks(this.habit.ID).then(resp => {
+        this.streaks = resp.data;
+      });
     },
     editHabit() {
       var event = { habit: this.habit };
@@ -135,7 +165,7 @@ export default {
     }
   },
   mounted() {
-    this.getActivities();
+    this.loadData();
   },
   components: {
     Skeleton,
@@ -143,3 +173,36 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+.streak {
+  font-size: 0.65em;
+
+  span {
+    text-align: center;
+    display: inline-block;
+    line-height: 1.2em;
+  }
+
+  &.mobile {
+    margin: 0 auto;
+  }
+}
+.divider {
+  height: 2.5em;
+  display: inline-block;
+  border-left: thin solid rgba(0, 0, 0, 0.12);
+  margin: 0 10px;
+  position: relative;
+  top: 5px;
+}
+.pushdown {
+  display: inline-block;
+  position: relative;
+  top: 15px;
+}
+.options {
+  left: -20px;
+  top: 15px;
+}
+</style>

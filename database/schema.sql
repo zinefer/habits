@@ -9,6 +9,7 @@ CREATE TABLE users (
     name        TEXT UNIQUE,
     real_name   TEXT,
     email       TEXT
+    UNIQUE(provider_id, provider)
 );
 
 CREATE TABLE habits (
@@ -23,4 +24,5 @@ CREATE TABLE activities (
     habit_id INTEGER REFERENCES habits(id),
     created  TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX ON activities(created);
 
