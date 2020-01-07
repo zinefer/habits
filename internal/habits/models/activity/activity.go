@@ -75,9 +75,9 @@ func CountByDayInLastYearByHabit(ctx context.Context, habitID int64) ([]*Activit
 
 // ActivityStreak model
 type ActivityStreak struct {
-	Streak    int
-	MinDate   time.Time
-	MaxDate   time.Time
+	Streak  int
+	MinDate time.Time
+	MaxDate time.Time
 }
 
 // ActivityStreaks model
@@ -109,8 +109,8 @@ func GetStreaksByHabit(ctx context.Context, habitID int64) (*ActivityStreaks, er
 	  INTO TEMPORARY TABLE streaks
 	  FROM groups
 	  GROUP BY grp;`, habitID)
-	
-	  if err != nil {
+
+	if err != nil {
 		return streaks, err
 	}
 

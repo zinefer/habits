@@ -25,7 +25,7 @@ func Create() func(res http.ResponseWriter, req *http.Request) {
 		activity := activity.New(habit.ID)
 		err := activity.Save(req.Context())
 		if err != nil {
-			fmt.Println(err);
+			fmt.Println(err)
 			http.Error(res, http.StatusText(400), 400)
 			return
 		}
@@ -40,7 +40,7 @@ func ListLastYear() func(res http.ResponseWriter, req *http.Request) {
 		habit := habitMW.GetHabitFromContext(req)
 		activities, err := habit.CountActivitiesInLastYear(req.Context())
 		if err != nil {
-			fmt.Println(err);
+			fmt.Println(err)
 			http.Error(res, http.StatusText(400), 400)
 			return
 		}
@@ -59,7 +59,7 @@ func Streaks() func(res http.ResponseWriter, req *http.Request) {
 
 		streak, err := habit.GetStreaks(req.Context())
 		if err != nil {
-			fmt.Println(err);
+			fmt.Println(err)
 			http.Error(res, http.StatusText(400), 400)
 			return
 		}

@@ -34,7 +34,7 @@ func Define(r *chi.Mux) {
 				rHO.Patch("/", habits.Update())
 				rHO.Delete("/", habits.Delete())
 			})
-			
+
 			r.Route("/{habit_id:[0-9]+}/activities", func(r chi.Router) {
 				r.Use(habit.HabitContextMiddleware())
 

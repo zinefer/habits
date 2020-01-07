@@ -114,13 +114,13 @@ func FileServer(r chi.Router, path string, filesDir string) {
 		if f.IsDir() {
 			return nil
 		}
-		
+
 		path, err = filepath.Rel(filesDir, path)
 		if err != nil {
 			panic(err)
 		}
 
-		r.Get("/" + path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.Get("/"+path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			fs.ServeHTTP(w, r)
 		}))
 

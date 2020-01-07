@@ -22,7 +22,7 @@ type Habit struct {
 func New(userID int64, name string) *Habit {
 	return &Habit{
 		UserID: userID,
-		Name: name,
+		Name:   name,
 	}
 }
 
