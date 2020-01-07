@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 
 	habitMW "github.com/zinefer/habits/internal/habits/middlewares/habit"
@@ -52,7 +53,31 @@ func Show() func(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// List habits
+// UserList habits for a user
+func UserList() func(res http.ResponseWriter, req *http.Request) {
+	return func(res http.ResponseWriter, req *http.Request) {
+		userName := chi.URLParam(req, "user")
+		u, err := user.FindByName(req.Context(), userName)
+		if u.ID == 0 {
+			http.Error(res, http.StatusText(404), 404)
+			return
+		}
+
+		habits, err := u.GetHabits(req.Context())
+		if err != nil {
+			fmt.Println(err)
+			http.Error(res, http.StatusText(400), 400)
+			return
+		}
+
+		if err := render.RenderList(res, req, NewHabitListResponse(habits)); err != nil {
+			http.Error(res, http.StatusText(400), 400)
+			return
+		}
+	}
+}
+
+// List habits for current_user
 func List() func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 		sess := session.GetSessionFromContext(req)
@@ -82,8 +107,13 @@ func Update() func(res http.ResponseWriter, req *http.Request) {
 		}
 
 		habit := habitMW.GetHabitFromContext(req)
+		habit.Name = data.Name
+		if err := habit.Update(req.Context()); err != nil {
+			fmt.Println(err)
+			http.Error(res, http.StatusText(400), 400)
+		}
 
-		render.Status(req, http.StatusCreated)
+		render.Status(req, 200)
 		render.Render(res, req, NewHabitResponse(habit))
 	}
 }

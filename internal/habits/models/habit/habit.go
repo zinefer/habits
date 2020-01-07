@@ -39,7 +39,7 @@ func (h *Habit) Save(ctx context.Context) error {
 // Update a Habit in the database
 func (h *Habit) Update(ctx context.Context) error {
 	db := database.GetDbFromContext(ctx)
-	stmt, err := db.PrepareNamed("UPDATE habits SET user_id = :user_id, name = :name, created = :created WHERE id = :id LIMIT 1;")
+	stmt, err := db.PrepareNamed("UPDATE habits SET user_id = :user_id, name = :name, created = :created WHERE id = :id;")
 	if err != nil {
 		return err
 	}

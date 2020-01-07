@@ -60,6 +60,14 @@ func FindByID(ctx context.Context, userID int64) (*User, error) {
 	return user, err
 }
 
+// FindByName returns a user by it's Name
+func FindByName(ctx context.Context, userName string) (*User, error) {
+	user := &User{}
+	db := database.GetDbFromContext(ctx)
+	err := db.Get(user, "SELECT * FROM users WHERE name = $1 LIMIT 1", userName)
+	return user, err
+}
+
 // IsNameAvailable checks to see if a username is already in use
 func IsNameAvailable(ctx context.Context, name string) (bool, error) {
 	db := database.GetDbFromContext(ctx)

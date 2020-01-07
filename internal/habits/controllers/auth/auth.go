@@ -83,7 +83,7 @@ func postLogin(ctx context.Context, res http.ResponseWriter, req *http.Request, 
 }
 
 func addUserToDatabase(ctx context.Context, gu goth.User) *user.User {
-	u := user.New(gu.UserID, gu.Name, gu.NickName, gu.Email, gu.Provider)
+	u := user.New(gu.UserID, gu.Provider, gu.NickName, gu.Name, gu.Email)
 	err := preventNameCollisions(ctx, u)
 	if err != nil {
 		panic(err)

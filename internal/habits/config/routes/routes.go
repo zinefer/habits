@@ -18,12 +18,14 @@ func Define(r *chi.Mux) {
 		r.Get("/auth/{provider}", auth.SignIn())
 		r.Get("/logout", auth.SignOut())
 
+		r.Get("/habits/{user:[a-z0-9-_]+}", habits.UserList())
+
 		r.Route("/habits", func(r chi.Router) {
 			r.Use(authorize.AuthorizeMiddleware())
 
 			r.Get("/", habits.List())
 			r.Post("/", habits.Create())
-			r.Route("/{id}", func(r chi.Router) {
+			r.Route("/{id:[0-9]+}", func(r chi.Router) {
 				r.Use(habit.HabitContextMiddleware())
 
 				r.Get("/", habits.Show())
@@ -32,14 +34,14 @@ func Define(r *chi.Mux) {
 				rHO.Patch("/", habits.Update())
 				rHO.Delete("/", habits.Delete())
 			})
-			r.Route("/{habit_id}/activities", func(r chi.Router) {
+			r.Route("/{habit_id:[0-9]+}/activities", func(r chi.Router) {
 				r.Use(habit.HabitContextMiddleware())
 
 				r.Get("/", activities.ListLastYear())
 
 				rHO := r.With(habit.HabitOwnerMiddleware())
 				rHO.Post("/", activities.Create())
-				rHO.Delete("/{id}", activities.Delete())
+				rHO.Delete("/{id:[0-9]+}", activities.Delete())
 			})
 		})
 	})
