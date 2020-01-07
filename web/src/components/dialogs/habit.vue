@@ -1,7 +1,9 @@
 <template>
   <v-dialog v-model="dialogVisible" max-width="700">
     <v-card>
-      <v-card-title class="headline justify-center">Add New Habit</v-card-title>
+      <v-card-title class="headline justify-center">
+        {{ haveHabitID ? "Edit" : "Add New" }} Habit
+      </v-card-title>
       <v-card-text>
         <v-container>
           <v-row>
@@ -31,35 +33,61 @@ import HabitsApi from "@/services/habits";
 import { EventBus } from "@/event_bus";
 
 export default {
-  name: "NewHabit",
-  props: ["show"],
+  name: "HabitDialog",
+  props: {
+    show: {
+      type: Boolean,
+      required: true
+    },
+    habit: {
+      type: Object,
+      default: () => ({ Name: "" })
+    }
+  },
   data() {
     return {
-      habit: { Name: "" },
       loading: false
     };
   },
   methods: {
     save() {
       this.loading = true;
-      HabitsApi.create(this.habit)
-        .then(resp => {
-          if (resp.status == 201) {
-            this.dialogVisible = false;
-            EventBus.$emit("reloadHabits");
-          } else {
-            alert("Unknown error creating habit");
-          }
-        })
-        .finally(() => {
-          this.loading = false;
-        });
+      if (this.haveHabitID) {
+        HabitsApi.update(this.habit)
+          .then(resp => {
+            if (resp.status == 200) {
+              this.dialogVisible = false;
+              EventBus.$emit("reloadHabits");
+            } else {
+              alert("Unknown error updating habit");
+            }
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      } else {
+        HabitsApi.create(this.habit)
+          .then(resp => {
+            if (resp.status == 201) {
+              this.dialogVisible = false;
+              EventBus.$emit("reloadHabits");
+            } else {
+              alert("Unknown error creating habit");
+            }
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      }
     },
     close() {
       this.dialogVisible = false;
     }
   },
   computed: {
+    haveHabitID: function() {
+      return typeof this.habit.ID != "undefined";
+    },
     dialogVisible: {
       get: function() {
         return this.show;
