@@ -1,6 +1,9 @@
 <template>
   <div ref="calendar">
-    <svg class="calendar-wrapper" :height="7 * (squareSize + 1) + headerHeight">
+    <svg
+      :class="{ 'calendar-wrapper': true, isMobile: isMobile }"
+      :height="height"
+    >
       <g
         class="calendar-dow"
         v-for="(dayName, dow) in ['Mon', 'Wed', 'Fri']"
@@ -9,19 +12,17 @@
         <text
           text-anchor="middle"
           fill="#ccc"
-          :x="squareSize / 2 - 2"
-          :y="
-            2 * dow * (squareSize + 1) +
-              headerHeight +
-              textHeight * 1.4 +
-              squareSize
-          "
+          :x="calendarDowX(dow)"
+          :y="calendarDowY(dow)"
         >
           {{ dayName }}
         </text>
       </g>
-      <g class="calendar-week" v-for="(week, w) in 53" :key="w">
-        <g v-for="(day, d) in values.slice(w * 7, w * 7 + 7)" :key="day.Day">
+      <g class="calendar-week" v-for="(week, w) in displayedWeeks" :key="w">
+        <g
+          v-for="(day, d) in filteredValues.slice(w * 7, w * 7 + 7)"
+          :key="day.Day"
+        >
           <rect
             class="calendar-day"
             :day="day.Day"
@@ -29,8 +30,8 @@
             :style="{ fill: color(day.Count) }"
             :width="squareSize"
             :height="squareSize"
-            :x="w * squareSize + w + squareSize"
-            :y="d * (squareSize + 1) + headerHeight"
+            :x="calendarDayX(w, d)"
+            :y="calendarDayY(w, d)"
             v-on:mouseover="showDayTooltip"
             v-on:mouseleave="hideDayTooltip"
           />
@@ -38,8 +39,8 @@
             v-if="isSecondSundayOfMonth(day.Day)"
             text-anchor="middle"
             fill="#ccc"
-            :x="w * squareSize + w + squareSize + squareSize"
-            :y="textHeight"
+            :x="calendarMonthX(w)"
+            :y="calendarMonthY(w)"
           >
             {{ getMonthName(day.Day) }}
           </text>
@@ -83,6 +84,10 @@ export default {
     rangeColors: {
       type: Array,
       default: () => DEFAULT_RANGE_COLOR
+    },
+    isMobile: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -129,14 +134,73 @@ export default {
     },
     getMonthName(date) {
       return months[date.split("-")[1] - 1];
+    },
+    calendarDayX(w, d) {
+      var n = w;
+      if (this.isMobile) {
+        n = d;
+      }
+
+      return n * this.squareSize + n + this.squareSize;
+    },
+    calendarDayY(w, d) {
+      var n = d;
+      if (this.isMobile) {
+        n = w;
+      }
+
+      return n * (this.squareSize + 1) + this.headerHeight;
+    },
+    calendarDowX(dow) {
+      if (this.isMobile) {
+        return (
+          2 * dow * (this.squareSize + 1) +
+          this.headerHeight +
+          this.textHeight * 1.4 +
+          this.squareSize
+        );
+      }
+      return this.squareSize / 2 - 2;
+    },
+    calendarDowY(dow) {
+      if (this.isMobile) {
+        return this.squareSize / 2 - 2;
+      }
+      return (
+        2 * dow * (this.squareSize + 1) +
+        this.headerHeight +
+        this.textHeight * 1.4 +
+        this.squareSize
+      );
+    },
+    calendarMonthX(w) {
+      if (this.isMobile) {
+        return this.textHeight;
+      }
+      return w * this.squareSize + w + this.squareSize + this.squareSize;
+    },
+    calendarMonthY(w) {
+      if (this.isMobile) {
+        return w * this.squareSize + w + this.squareSize + this.squareSize;
+      }
+      return this.textHeight;
     }
   },
   mounted() {
-    this.squareSize = this.$refs.calendar.offsetWidth / 56;
+    if (this.isMobile) {
+      this.squareSize = this.$refs.calendar.offsetWidth / 9;
+    } else {
+      this.squareSize = this.$refs.calendar.offsetWidth / 56;
+    }
   },
   computed: {
+    height: function() {
+      if (this.isMobile)
+        return this.displayedWeeks * (this.squareSize + 1) + this.headerHeight;
+      return 7 * (this.squareSize + 1) + this.headerHeight;
+    },
     max: function() {
-      var filtered = this.values
+      var filtered = this.filteredValues
         .filter(value => value.Count > 0)
         .map(function(value) {
           return value.Count;
@@ -148,6 +212,19 @@ export default {
 
       // 95th percentile max
       return sorted[Math.round(sorted.length * 0.95) - 1];
+    },
+    displayedWeeks: function() {
+      if (this.isMobile) return 12;
+      return 53;
+    },
+    filteredValues: function() {
+      if (this.isMobile) {
+        var today = new Date();
+        return this.values.slice(
+          this.values.length - (this.displayedWeeks - 1) * 7 - today.getUTCDay()
+        );
+      }
+      return this.values;
     }
   }
 };

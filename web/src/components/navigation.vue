@@ -42,7 +42,7 @@
       <v-fab-transition>
         <v-btn
           ref="add_habit"
-          @click.stop="showNewHabit = true"
+          @click.stop="showHabitDialog = true"
           color="secondary"
           fab
           absolute
@@ -53,27 +53,39 @@
       </v-fab-transition>
     </template>
 
-    <NewHabit :show="showNewHabit" @close="newHabitClose" />
+    <HabitDialog
+      :show="showHabitDialog"
+      :habit="habit"
+      @close="habitDialogClose"
+    />
   </v-app-bar>
 </template>
 
 <script>
 import Login from "@/components/dialogs/login.vue";
-import NewHabit from "@/components/dialogs/newhabit.vue";
+import HabitDialog from "@/components/dialogs/habit.vue";
+
+import { EventBus } from "@/event_bus";
 
 export default {
   name: "Navigation",
   components: {
     Login,
-    NewHabit
+    HabitDialog
   },
   data: function() {
     return {
       showLogin: false,
-      showNewHabit: false
+      showHabitDialog: false,
+      habit: undefined
     };
   },
-  created() {},
+  mounted() {
+    return EventBus.$on("editHabit", event => {
+      this.habit = event.habit;
+      this.showHabitDialog = true;
+    });
+  },
   computed: {
     isLoggedIn: function() {
       return this.$store.getters.isLoggedIn;
@@ -83,8 +95,9 @@ export default {
     loginClose() {
       this.showLogin = false;
     },
-    newHabitClose() {
-      this.showNewHabit = false;
+    habitDialogClose() {
+      this.habit = undefined;
+      this.showHabitDialog = false;
     }
   }
 };

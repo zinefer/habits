@@ -1,64 +1,63 @@
 <template>
-  <div class="mb-8">
-    <v-card style="position:relative">
-      <v-speed-dial
-        style="left:-20px;top:10px"
-        absolute
-        v-model="optionsOpen"
-        direction="left"
-        transition="slide-x-reverse-transition"
+  <v-card style="position:relative">
+    <v-speed-dial
+      style="left:-20px;top:10px"
+      absolute
+      v-model="optionsOpen"
+      :direction="speedDialDirection"
+      transition="slide-x-reverse-transition"
+      fab
+    >
+      <template v-slot:activator>
+        <v-btn v-model="optionsOpen" color="primary" fab small>
+          <v-icon v-if="optionsOpen">mdi-close</v-icon>
+          <v-icon v-else>mdi-settings</v-icon>
+        </v-btn>
+      </template>
+      <v-btn fab dark small color="green" @click.stop="editHabit">
+        <v-icon>mdi-pencil</v-icon>
+      </v-btn>
+      <v-btn
         fab
+        dark
+        small
+        color="red"
+        @click.stop="deleteHabit"
+        :loading="deleting"
       >
-        <template v-slot:activator>
-          <v-btn v-model="optionsOpen" color="primary" fab small>
-            <v-icon v-if="optionsOpen">mdi-close</v-icon>
-            <v-icon v-else>mdi-settings</v-icon>
-          </v-btn>
-        </template>
-        <v-btn fab dark small color="green">
-          <v-icon>mdi-pencil</v-icon>
-        </v-btn>
-        <v-btn
-          fab
-          dark
-          small
-          color="red"
-          @click="deleteHabit"
-          :loading="deleting"
-        >
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-      </v-speed-dial>
-      <v-card-title>
-        <span class="pl-3">{{ habit.Name }}</span>
-      </v-card-title>
-      <v-card-text>
-        <v-scale-transition hide-on-leave>
-          <Skeleton v-if="this.loading" type="habit-calendar-days" />
-          <HabitCalendar
-            v-else
-            v-bind:values="this.activities"
-            v-on:showTooltip="showTooltip"
-            v-on:hideTooltip="hideTooltip"
-          />
-        </v-scale-transition>
-      </v-card-text>
-      <v-fab-transition>
-        <v-btn
-          color="secondary"
-          fab
-          dark
-          absolute
-          bottom
-          right
-          :loading="addingNew"
-          @click="addNewActivity"
-        >
-          <v-icon>mdi-plus-box</v-icon>
-        </v-btn>
-      </v-fab-transition>
-    </v-card>
-  </div>
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
+    </v-speed-dial>
+    <v-card-title>
+      <span class="pl-3">{{ habit.Name }}</span>
+    </v-card-title>
+    <v-card-text>
+      <v-scale-transition hide-on-leave>
+        <Skeleton v-if="this.loading" type="habit-calendar-days" />
+        <HabitCalendar
+          v-else
+          :values="this.activities"
+          :isMobile="isMobile"
+          v-on:showTooltip="showTooltip"
+          v-on:hideTooltip="hideTooltip"
+        />
+      </v-scale-transition>
+    </v-card-text>
+    <v-fab-transition>
+      <v-btn
+        color="secondary"
+        fab
+        dark
+        absolute
+        bottom
+        right
+        :loading="addingNew"
+        @click.stop="addNewActivity"
+      >
+        <v-icon>mdi-plus-box</v-icon>
+      </v-btn>
+    </v-fab-transition>
+  </v-card>
 </template>
 
 <script>
@@ -71,7 +70,7 @@ import { EventBus } from "@/event_bus";
 
 export default {
   name: "HabitCard",
-  props: ["habit"],
+  props: ["habit", "isMobile"],
   data() {
     return {
       loading: true,
@@ -80,6 +79,11 @@ export default {
       addingNew: false,
       activities: []
     };
+  },
+  computed: {
+    speedDialDirection: function() {
+      return this.isMobile ? "bottom" : "left";
+    }
   },
   methods: {
     addNewActivity() {
@@ -103,6 +107,11 @@ export default {
         .finally(() => {
           this.loading = false;
         });
+    },
+    editHabit() {
+      var event = { habit: this.habit };
+      EventBus.$emit("editHabit", event);
+      this.optionsOpen = false;
     },
     deleteHabit() {
       this.deleting = true;

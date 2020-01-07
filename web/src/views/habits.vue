@@ -1,9 +1,11 @@
 <template>
-  <v-container>
-    <v-row dense>
-      <v-col cols="12">
-        <HabitCard v-for="habit in habits" :key="habit.ID" :habit="habit" />
+  <v-container fluid :class="{ 'pt-10': isMobile }">
+    <v-row dense v-for="habit in habits" :key="habit.ID" class="mb-6">
+      <v-spacer />
+      <v-col cols="10">
+        <HabitCard :habit="habit" :isMobile="isMobile" />
       </v-col>
+      <v-spacer />
     </v-row>
   </v-container>
 </template>
@@ -22,6 +24,11 @@ export default {
       loading: true,
       habits: []
     };
+  },
+  computed: {
+    isMobile: function() {
+      return screen.width <= 960;
+    }
   },
   methods: {
     loadHabits() {
