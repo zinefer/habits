@@ -16,6 +16,11 @@ const routes = [
     }
   },
   {
+    path: "/habits/:user",
+    name: "User Habits",
+    component: Habits
+  },
+  {
     path: "/habits",
     name: "Habits",
     component: Habits,

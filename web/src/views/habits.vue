@@ -26,23 +26,40 @@ export default {
     };
   },
   computed: {
+    user: function() {
+      return this.$route.params.user;
+    },
     isMobile: function() {
       return screen.width <= 960;
+    },
+    isLoggedIn: function() {
+      return this.$store.getters.isLoggedIn;
     }
   },
   methods: {
     loadHabits() {
       this.loading = true;
-      HabitsApi.get()
-        .then(resp => {
-          this.habits = resp.data;
-        })
-        .finally(() => {
-          this.loading = false;
-        });
+
+      if (this.user != null) {
+        HabitsApi.getByUser(this.user)
+          .then(resp => {
+            this.habits = resp.data;
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      } else {
+        HabitsApi.get()
+          .then(resp => {
+            this.habits = resp.data;
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      }
     }
   },
-  created() {
+  mounted() {
     this.loadHabits();
 
     EventBus.$on("reloadHabits", () => {

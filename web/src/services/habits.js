@@ -6,6 +6,9 @@ export default {
   get() {
     return axios.get("/api/habits").catch(error => konsole.log(error));
   },
+  getByUser(user) {
+    return axios.get("/api/habits/" + user).catch(error => konsole.log(error));
+  },
   create(habit) {
     return axios.post("/api/habits", habit).catch(error => konsole.log(error));
   },
