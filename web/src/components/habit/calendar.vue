@@ -116,7 +116,7 @@ export default {
         .join(" ");
 
       this.$emit("showTooltip", {
-        top: transform.top - 75,
+        top: transform.top - 20,
         left: transform.left,
         text: date + ": " + event.currentTarget.getAttribute("count")
       });
@@ -156,8 +156,8 @@ export default {
         return (
           2 * dow * (this.squareSize + 1) +
           this.headerHeight +
-          this.textHeight * 1.4 +
-          this.squareSize
+          this.squareSize * 2 -
+          2
         );
       }
       return this.squareSize / 2 - 2;
@@ -181,7 +181,13 @@ export default {
     },
     calendarMonthY(w) {
       if (this.isMobile) {
-        return w * this.squareSize + w + this.squareSize + this.squareSize;
+        return (
+          w * this.squareSize +
+          w +
+          this.squareSize +
+          this.squareSize -
+          this.textHeight / 2
+        );
       }
       return this.textHeight;
     }
@@ -221,11 +227,7 @@ export default {
       if (this.isMobile) {
         var today = new Date();
         return this.values.slice(
-          this.values.length +
-            1 -
-            this.displayedWeeks * 7 +
-            today.getUTCDay() +
-            1
+          this.values.length - this.displayedWeeks * 7 + today.getDay() + 2
         );
       }
       return this.values;
