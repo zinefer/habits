@@ -36,14 +36,6 @@ var (
 	db            *sqlx.DB
 )
 
-var schema = `
-CREATE TABLE users (
-    name text,
-    nickname text,
-	email text,
-	provider text
-);`
-
 func init() {
 	gob.Register(&user.User{})
 }
@@ -78,8 +70,6 @@ func (c *Subcommand) Run() bool {
 		//google.New(configuration.GoogleClientID, configuration.GoogleClientSecret, "http://localhost:3000/api/auth/google/callback"),
 		//facebook.New(configuration.FacebookClientID, configuration.FacebookClientSecret, "http://localhost:3000/api/auth/facebook/callback"),
 	)
-
-	//db.MustExec(schema)
 
 	r := chi.NewRouter()
 

@@ -2,6 +2,13 @@ import axios from "axios";
 
 var konsole = console;
 
+axios.interceptors.response.use(null, function(error) {
+  if (error.response.status === 401) {
+    location.reload();
+  }
+  return Promise.reject(error);
+});
+
 export default {
   get() {
     return axios.get("/api/habits").catch(error => konsole.log(error));

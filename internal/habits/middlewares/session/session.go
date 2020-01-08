@@ -29,3 +29,16 @@ func GetSessionFromContext(req *http.Request) *sessions.Session {
 	}
 	panic("Unable to obtain session from context")
 }
+
+// DeleteSessionInContext deletes the session
+func DeleteSessionInContext(res http.ResponseWriter, req *http.Request) {
+	if session, ok := req.Context().Value(sessionContextKey).(*sessions.CookieStore); ok {
+		sess, _ := session.Get(req, "habits")
+		sess.Options.MaxAge = -1
+		sess.Save(req, res)
+
+		sess, _ = session.Get(req, "current_user")
+		sess.Options.MaxAge = -1
+		sess.Save(req, res)
+	}
+}

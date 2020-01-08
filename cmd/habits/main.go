@@ -11,6 +11,7 @@ import (
 	"github.com/zinefer/habits/internal/habits/config"
 	"github.com/zinefer/habits/internal/habits/tasks/db"
 	"github.com/zinefer/habits/internal/habits/tasks/serve"
+	"github.com/zinefer/habits/internal/habits/tasks/secret"
 )
 
 var taskArg string
@@ -34,6 +35,7 @@ func main() {
 	subcommands := subcommander.New()
 	subcommands.Register("serve", "Serve habits", serve.New(configuration, database))
 	subcommands.Register("db", "Database management", db.New(configuration, database))
+	subcommands.Register("secret", "Secret management", secret.New(configuration))
 	success := subcommands.Execute(taskArg)
 
 	if success {

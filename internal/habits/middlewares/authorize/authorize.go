@@ -11,8 +11,9 @@ import (
 func AuthorizeMiddleware() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			session := session.GetSessionFromContext(r)
-			if user, _ := session.Values["current_user"].(*user.User); user == nil {
+			sess := session.GetSessionFromContext(r)
+			if user, _ := sess.Values["current_user"].(*user.User); user == nil {
+				session.DeleteSessionInContext(w, r)
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			} else {
 				next.ServeHTTP(w, r)
