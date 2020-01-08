@@ -2,7 +2,6 @@ package habit
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/zinefer/habits/internal/habits/middlewares/database"
@@ -77,7 +76,6 @@ func (h *Habit) GetActivities(ctx context.Context) ([]*activity.Activity, error)
 func FindAllByUser(ctx context.Context, userID int64) ([]*Habit, error) {
 	db := database.GetDbFromContext(ctx)
 	habits := []*Habit{}
-	fmt.Println("SELECT * FROM habits WHERE user_id = $1;", userID)
 	err := db.Select(&habits, "SELECT * FROM habits WHERE user_id = $1;", userID)
 	return habits, err
 }

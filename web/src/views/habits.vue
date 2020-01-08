@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid :class="{ 'pt-10': isMobile }">
+  <v-container fluid :class="{ 'pt-10': pushContentDown }">
     <v-row dense v-for="habit in habits" :key="habit.ID" class="mb-6">
       <v-spacer />
       <v-col cols="10">
@@ -28,6 +28,9 @@ export default {
   computed: {
     user: function() {
       return this.$route.params.user;
+    },
+    pushContentDown: function() {
+      return this.isMobile && this.isLoggedIn;
     },
     isMobile: function() {
       return screen.width <= 960;

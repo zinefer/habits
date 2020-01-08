@@ -39,4 +39,4 @@ yarn-error.log*
 *.sln
 *.sw?
 
-secret
+/secret
