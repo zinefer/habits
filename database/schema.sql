@@ -8,7 +8,7 @@ CREATE TABLE users (
     provider    TEXT,
     name        TEXT UNIQUE,
     real_name   TEXT,
-    email       TEXT
+    email       TEXT,
     UNIQUE(provider_id, provider)
 );
 
