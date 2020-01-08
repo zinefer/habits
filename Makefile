@@ -33,11 +33,19 @@ stop-server:
 restart-server: stop-server start-server
 
 ## build: Build the application
-build: build-js
-	GO111MODULE=on go build -o $(BIN)/$(PROJECT) $(MAIN)
+build: build-js build-api	
 
 build-js:
 	npm run build
+
+build-js-production:
+	npm run build
+
+build-api:
+	GO111MODULE=on go build -o $(BIN)/$(PROJECT) $(MAIN)
+
+build-api-production:
+	GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o $(BIN)/$(PROJECT) $(MAIN)
 
 ## test: Test the application
 test:
