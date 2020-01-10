@@ -116,9 +116,8 @@ func (c *Subcommand) Run() bool {
 	filesDir := filepath.Join(workDir, "web/dist")
 	FileServer(r, "/", filesDir)
 
-	var certMan *autocert.Manager
 	if c.config.IsProduction() {
-		certMan = &autocert.Manager{
+		certMan := &autocert.Manager{
 			Prompt:     autocert.AcceptTOS,
 			Cache:      autocert.DirCache(config.CertsConfigPath),
 			HostPolicy: autocert.HostWhitelist(c.config.Hostname, "www."+c.config.Hostname),
@@ -126,37 +125,32 @@ func (c *Subcommand) Run() bool {
 
 		tlsServer := &http.Server{
 			Addr:    ":https",
-			Handler: r,
+			Handler: certMan.HTTPHandler(r),
 			TLSConfig: &tls.Config{
 				GetCertificate: certMan.GetCertificate,
 			},
 		}
 
-		go func() {
-			fmt.Printf("Starting HTTPS server on %s\n", tlsServer.Addr)
-			err := tlsServer.ListenAndServeTLS("", "")
-			if err != nil {
-				fmt.Println("tlsServer.ListendAndServeTLS() failed with")
-				panic(err)
-			}
-		}()
+		fmt.Printf("Starting HTTPS server on %s\n", tlsServer.Addr)
+		err := tlsServer.ListenAndServeTLS("", "")
+		if err != nil {
+			fmt.Println("tlsServer.ListendAndServeTLS() failed with")
+			panic(err)
+		}
+	} else {
+		server := &http.Server{
+			Addr:    c.config.ListenAddress,
+			Handler: r,
+		}
+
+		fmt.Printf("Starting HTTP server on %s\n", c.config.ListenAddress)
+		err := server.ListenAndServe()
+		if err != nil {
+			fmt.Println("server.ListenAndServe() failed with")
+			panic(err)
+		}
 	}
 
-	server := &http.Server{
-		Addr:    c.config.ListenAddress,
-		Handler: r,
-	}
-
-	if c.config.IsProduction() {
-		server.Handler = certMan.HTTPHandler(nil)
-	}
-
-	fmt.Printf("Starting HTTP server on %s\n", c.config.ListenAddress)
-	err := server.ListenAndServe()
-	if err != nil {
-		fmt.Println("server.ListenAndServe() failed with")
-		panic(err)
-	}
 	return true
 }
 
