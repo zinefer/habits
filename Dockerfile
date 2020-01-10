@@ -35,11 +35,14 @@ RUN make build-js-production
 
 # Final image
 FROM alpine
+ARG COMMIT
 WORKDIR /app
 
 COPY --from=gobuilder /go/src/habits/bin/*    .
 COPY --from=gobuilder /go/src/habits/database ./database
 COPY --from=jsbuilder /app/web/dist           ./web/dist
+
+RUN echo ${COMMIT} > ./web/dist/version
 
 EXPOSE 80
 EXPOSE 443
