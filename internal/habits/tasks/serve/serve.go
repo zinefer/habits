@@ -84,8 +84,6 @@ func (c *Subcommand) Run() bool {
 	filesDir := filepath.Join(workDir, "web/dist")
 	FileServer(r, "/", filesDir)
 
-	routes.Define(r)
-
 	fmt.Printf("Listening on %s\n", c.config.ListenAddress)
 	http.ListenAndServe(c.config.ListenAddress, r)
 	return true
