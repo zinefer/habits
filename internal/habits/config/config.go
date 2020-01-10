@@ -13,7 +13,7 @@ import (
 
 var (
 	// CertsConfigPath points to a directory we will cache LTS certs in
-	CertsConfigPath = "certs"
+	CertsConfigPath = "/home/certs"
 	// SecretConfigPath points to the session secret file
 	SecretConfigPath = "secret"
 	// DatabaseConfigPath points to the database config yaml
@@ -64,6 +64,10 @@ func New() *Configuration {
 	flag.StringVar(&c.FacebookClientSecret, "auth-facebook-secret", os.Getenv("HABITS_OAUTH_FACEBOOK_SECRET"), "facebook oauth client secret")
 
 	flag.Parse()
+
+	if c.IsProduction() {
+		SecretConfigPath = "/home/secret"
+	}
 
 	c.parseDatabaseConfig()
 	c.SessionSecret = c.readSecretConfig()
