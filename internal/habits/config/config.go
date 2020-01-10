@@ -54,7 +54,7 @@ func New() *Configuration {
 
 	flag.StringVar(&c.Hostname, "hostname", "habits.watch", "Application hostname")
 	flag.StringVar(&c.Environment, "env", env, "Environment to run application in")
-	flag.StringVar(&c.ListenAddress, "listen-addr", "80", "server listen address")
+	flag.StringVar(&c.ListenAddress, "listen-addr", ":80", "server listen address")
 
 	flag.StringVar(&c.GithubClientID, "auth-github-id", os.Getenv("HABITS_OAUTH_GITHUB_ID"), "github oauth client id")
 	flag.StringVar(&c.GithubClientSecret, "auth-github-secret", os.Getenv("HABITS_OAUTH_GITHUB_SECRET"), "github oauth client secret")
