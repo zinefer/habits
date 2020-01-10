@@ -2,6 +2,7 @@ dist: bionic
 
 services:
   - postgresql
+  - docker
 addons:
   postgresql: 10
 
@@ -31,3 +32,9 @@ script:
 after_script:
   - $GOPATH/bin/goveralls -coverprofile=c.out -service=travis-ci
   - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+
+deploy:
+  provider: script
+  script: bash devops/scripts/docker_push.sh
+  on:
+    branch: master

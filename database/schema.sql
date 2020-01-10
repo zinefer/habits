@@ -18,11 +18,12 @@ CREATE TABLE habits (
     name    TEXT NOT NULL,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX ON habits(user_id);
 
 CREATE TABLE activities (
     id       SERIAL PRIMARY KEY,
     habit_id INTEGER REFERENCES habits(id),
     created  TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX ON activities(created);
+CREATE INDEX ON activities(habit_id, created);
 
