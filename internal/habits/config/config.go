@@ -67,6 +67,7 @@ func New() *Configuration {
 
 	c.parseDatabaseConfig()
 	c.SessionSecret = c.readSecretConfig()
+	os.Setenv("SESSION_SECRET", string(c.SessionSecret))
 
 	dbHost := os.Getenv("HABITS_DATABASE_HOST")
 	if len(dbHost) > 0 {

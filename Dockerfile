@@ -43,4 +43,5 @@ COPY --from=jsbuilder /app/web/dist           ./web/dist
 
 EXPOSE 80
 EXPOSE 443
+ENV HABITS_ENVIRONMENT=production
 CMD ["./habits", "serve"]
