@@ -124,7 +124,7 @@ func (c *Subcommand) Run() bool {
 		}
 
 		tlsServer := &http.Server{
-			Addr:    ":https",
+			Addr:    ":443",
 			Handler: certMan.HTTPHandler(r),
 			TLSConfig: &tls.Config{
 				GetCertificate: certMan.GetCertificate,
