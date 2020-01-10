@@ -10,8 +10,8 @@ import (
 
 	"github.com/zinefer/habits/internal/habits/config"
 	"github.com/zinefer/habits/internal/habits/tasks/db"
-	"github.com/zinefer/habits/internal/habits/tasks/serve"
 	"github.com/zinefer/habits/internal/habits/tasks/secret"
+	"github.com/zinefer/habits/internal/habits/tasks/serve"
 )
 
 var taskArg string

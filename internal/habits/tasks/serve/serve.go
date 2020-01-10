@@ -14,13 +14,14 @@ import (
 
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
+	"github.com/markbates/goth/providers/facebook"
 	"github.com/markbates/goth/providers/github"
-
-	//"github.com/markbates/goth/providers/google"
-	//"github.com/markbates/goth/providers/facebook"
+	"github.com/markbates/goth/providers/google"
 
 	"github.com/jmoiron/sqlx"
 
+	"github.com/zinefer/habits/internal/pkg/database/manager"
+	"github.com/zinefer/habits/internal/pkg/database/migrator"
 	"github.com/zinefer/habits/internal/pkg/subcommander"
 
 	"github.com/zinefer/habits/internal/habits/config"
@@ -62,13 +63,33 @@ func (*Subcommand) Subcommander() *subcommander.Subcommander {
 // Run the http server
 func (c *Subcommand) Run() bool {
 	session = sessions.NewCookieStore([]byte(c.config.SessionSecret))
-
 	gothic.Store = session
 
+	if c.config.Environment == "production" {
+		migrate := migrator.New(c.db, config.DatabaseMigrationPath)
+		if migrate.MigrationsTableExists() {
+			fmt.Println("Executing migrations if they exist")
+			err := migrate.Migrate()
+			if err != nil {
+				fmt.Println("Fatal Error: unable to migrate database")
+				panic(err)
+			}
+		} else {
+			fmt.Println("Fresh database detected, loading schema")
+			dbMan := manager.New(c.db)
+			err := dbMan.Load(config.DatabaseSchemaPath)
+			if err != nil {
+				fmt.Println("Fatal Error: unable to load database schema")
+				panic(err)
+			}
+		}
+	}
+
+	baseAuthURL := "https://" + c.config.Hostname + "/api/auth/"
 	goth.UseProviders(
-		github.New(c.config.GithubClientID, c.config.GithubClientSecret, "http://127.0.0.1:3000/api/auth/github/callback"),
-		//google.New(configuration.GoogleClientID, configuration.GoogleClientSecret, "http://localhost:3000/api/auth/google/callback"),
-		//facebook.New(configuration.FacebookClientID, configuration.FacebookClientSecret, "http://localhost:3000/api/auth/facebook/callback"),
+		github.New(c.config.GithubClientID, c.config.GithubClientSecret, baseAuthURL+"github/callback"),
+		google.New(configuration.GoogleClientID, configuration.GoogleClientSecret, baseAuthURL+"google/callback"),
+		facebook.New(configuration.FacebookClientID, configuration.FacebookClientSecret, baseAuthURL+"facebook/callback"),
 	)
 
 	r := chi.NewRouter()

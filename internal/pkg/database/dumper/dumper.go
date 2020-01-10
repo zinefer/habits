@@ -45,7 +45,7 @@ func (d *SQLDumper) Dump(path string) error {
 		comma := false
 
 		if len(table.Columns) > 0 {
-			w := tabwriter.NewWriter(f, 8, 8, 0, '\t', 0)
+			w := tabwriter.NewWriter(f, 4, 0, 1, ' ', 0)
 
 			for _, column := range table.Columns {
 				if !comma {

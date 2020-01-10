@@ -34,7 +34,7 @@ func New(db *sqlx.DB, migrationsPath string) *SQLMigrator {
 
 // Migrate reconciles a database to a state described by a collection of sql migrations
 func (m *SQLMigrator) Migrate() error {
-	if !m.migrationsTableExists() {
+	if !m.MigrationsTableExists() {
 		m.initializeDatabase()
 	}
 
@@ -79,7 +79,7 @@ func (m *SQLMigrator) Migrate() error {
 
 // Rollback to the last version
 func (m *SQLMigrator) Rollback() error {
-	if !m.migrationsTableExists() {
+	if !m.MigrationsTableExists() {
 		return errors.New("Migrations table does not exist")
 	}
 
@@ -162,7 +162,8 @@ func (m *SQLMigrator) initializeDatabase() (bool, error) {
 	return true, nil
 }
 
-func (m *SQLMigrator) migrationsTableExists() bool {
+// MigrationsTableExists returns true if a migrations table exists
+func (m *SQLMigrator) MigrationsTableExists() bool {
 	_, err := m.db.Exec("SELECT 1 FROM schema_migrations LIMIT 1")
 	return err == nil
 }
