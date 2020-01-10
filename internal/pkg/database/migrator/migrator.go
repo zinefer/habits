@@ -52,24 +52,26 @@ func (m *SQLMigrator) Migrate() error {
 	dbManager := manager.New(tx)
 
 	for _, f := range files {
-		name := f.Name()
-		version := getVersionFromFilename(name)
-		needsRun := m.hasMigrationAlreadyRun(version) == false
+		if f.IsDir() {
+			name := f.Name()
+			version := getVersionFromFilename(name)
+			needsRun := m.hasMigrationAlreadyRun(version) == false
 
-		if needsRun {
-			fmt.Printf("Executing new migration %v▲\n", name)
+			if needsRun {
+				fmt.Printf("Executing new migration %v▲\n", name)
 
-			path := filepath.Join(m.migrationsPath, name, "up.sql")
-			err = dbManager.Load(path)
-			if err != nil {
-				tx.Rollback()
-				return err
-			}
+				path := filepath.Join(m.migrationsPath, name, "up.sql")
+				err = dbManager.Load(path)
+				if err != nil {
+					tx.Rollback()
+					return err
+				}
 
-			err = markMigrationAlreadyRun(tx, version)
-			if err != nil {
-				tx.Rollback()
-				return err
+				err = markMigrationAlreadyRun(tx, version)
+				if err != nil {
+					tx.Rollback()
+					return err
+				}
 			}
 		}
 	}
