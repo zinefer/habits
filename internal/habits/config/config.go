@@ -12,6 +12,8 @@ import (
 )
 
 var (
+	// CertsConfigPath points to a directory we will cache LTS certs in
+	CertsConfigPath = "certs"
 	// SecretConfigPath points to the session secret file
 	SecretConfigPath = "secret"
 	// DatabaseConfigPath points to the database config yaml
@@ -52,7 +54,7 @@ func New() *Configuration {
 
 	flag.StringVar(&c.Hostname, "hostname", "habits.watch", "Application hostname")
 	flag.StringVar(&c.Environment, "env", env, "Environment to run application in")
-	flag.StringVar(&c.ListenAddress, "listen-addr", ":3000", "server listen address")
+	flag.StringVar(&c.ListenAddress, "listen-addr", "80", "server listen address")
 
 	flag.StringVar(&c.GithubClientID, "auth-github-id", os.Getenv("HABITS_OAUTH_GITHUB_ID"), "github oauth client id")
 	flag.StringVar(&c.GithubClientSecret, "auth-github-secret", os.Getenv("HABITS_OAUTH_GITHUB_SECRET"), "github oauth client secret")
@@ -87,7 +89,7 @@ func New() *Configuration {
 func (c *Configuration) readSecretConfig() []byte {
 	data, err := ioutil.ReadFile(SecretConfigPath)
 	if err != nil || len(data) == 0 {
-		if c.Environment == "production" {
+		if c.IsProduction() {
 			fmt.Println("Creating secret data for encrypting session")
 			data = c.CreateSecretConfig()
 		}
@@ -104,6 +106,11 @@ func (c *Configuration) CreateSecretConfig() []byte {
 		fmt.Println(err)
 	}
 	return data
+}
+
+// IsProduction returns true if the application is running in production
+func (c *Configuration) IsProduction() bool {
+	return c.Environment == "production"
 }
 
 func (c *Configuration) parseDatabaseConfig() {

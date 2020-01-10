@@ -21,7 +21,7 @@ stop: stop-server
 
 start-server:
 	@echo "  >  $(PROJECT) has been started"
-	@$(BIN)/$(PROJECT) serve 2>&1 & echo $$! > $(PID)
+	@$(BIN)/$(PROJECT) serve --listen-addr :3000 2>&1 & echo $$! > $(PID)
 	@cat $(PID) | sed "/^/s/^/  \>  PID: /"
 
 stop-server:
@@ -36,7 +36,7 @@ restart-server: stop-server start-server
 build: build-js build-api	
 
 build-js:
-	npm run build
+	npm run build -- --mode development
 
 build-js-production:
 	npm run build

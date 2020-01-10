@@ -1,12 +1,17 @@
 package serve
 
 import (
+	"crypto/tls"
 	"encoding/gob"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/crypto/acme/autocert"
+
+	"github.com/jmoiron/sqlx"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -17,8 +22,6 @@ import (
 	"github.com/markbates/goth/providers/facebook"
 	"github.com/markbates/goth/providers/github"
 	"github.com/markbates/goth/providers/google"
-
-	"github.com/jmoiron/sqlx"
 
 	"github.com/zinefer/habits/internal/pkg/database/manager"
 	"github.com/zinefer/habits/internal/pkg/database/migrator"
@@ -65,7 +68,7 @@ func (c *Subcommand) Run() bool {
 	session = sessions.NewCookieStore([]byte(c.config.SessionSecret))
 	gothic.Store = session
 
-	if c.config.Environment == "production" {
+	if c.config.IsProduction() {
 		migrate := migrator.New(c.db, config.DatabaseMigrationPath)
 		if migrate.MigrationsTableExists() {
 			fmt.Println("Executing migrations if they exist")
@@ -86,11 +89,19 @@ func (c *Subcommand) Run() bool {
 	}
 
 	baseAuthURL := "https://" + c.config.Hostname + "/api/auth/"
-	goth.UseProviders(
-		github.New(c.config.GithubClientID, c.config.GithubClientSecret, baseAuthURL+"github/callback"),
-		google.New(configuration.GoogleClientID, configuration.GoogleClientSecret, baseAuthURL+"google/callback"),
-		facebook.New(configuration.FacebookClientID, configuration.FacebookClientSecret, baseAuthURL+"facebook/callback"),
-	)
+	oauthProviders := []goth.Provider{}
+	if len(c.config.GithubClientID) > 0 && len(c.config.GithubClientSecret) > 0 {
+		oauthProviders = append(oauthProviders, github.New(c.config.GithubClientID, c.config.GithubClientSecret, baseAuthURL+"github/callback"))
+	}
+
+	if len(c.config.FacebookClientID) > 0 && len(c.config.FacebookClientSecret) > 0 {
+		oauthProviders = append(oauthProviders, facebook.New(c.config.FacebookClientID, c.config.FacebookClientSecret, baseAuthURL+"facebook/callback"))
+	}
+
+	if len(c.config.GoogleClientID) > 0 && len(c.config.GoogleClientSecret) > 0 {
+		oauthProviders = append(oauthProviders, google.New(c.config.GoogleClientID, c.config.GoogleClientSecret, baseAuthURL+"google/callback"))
+	}
+	goth.UseProviders(oauthProviders...)
 
 	r := chi.NewRouter()
 
@@ -105,8 +116,47 @@ func (c *Subcommand) Run() bool {
 	filesDir := filepath.Join(workDir, "web/dist")
 	FileServer(r, "/", filesDir)
 
-	fmt.Printf("Listening on %s\n", c.config.ListenAddress)
-	http.ListenAndServe(c.config.ListenAddress, r)
+	var certMan *autocert.Manager
+	if c.config.IsProduction() {
+		certMan = &autocert.Manager{
+			Prompt:     autocert.AcceptTOS,
+			Cache:      autocert.DirCache(config.CertsConfigPath),
+			HostPolicy: autocert.HostWhitelist(c.config.Hostname, "www."+c.config.Hostname),
+		}
+
+		tlsServer := &http.Server{
+			Addr:    ":https",
+			Handler: r,
+			TLSConfig: &tls.Config{
+				GetCertificate: certMan.GetCertificate,
+			},
+		}
+
+		go func() {
+			fmt.Printf("Starting HTTPS server on %s\n", tlsServer.Addr)
+			err := tlsServer.ListenAndServeTLS("", "")
+			if err != nil {
+				fmt.Println("tlsServer.ListendAndServeTLS() failed with")
+				panic(err)
+			}
+		}()
+	}
+
+	server := &http.Server{
+		Addr:    c.config.ListenAddress,
+		Handler: r,
+	}
+
+	if c.config.IsProduction() {
+		server.Handler = certMan.HTTPHandler(nil)
+	}
+
+	fmt.Printf("Starting HTTP server on %s\n", c.config.ListenAddress)
+	err := server.ListenAndServe()
+	if err != nil {
+		fmt.Println("server.ListenAndServe() failed with")
+		panic(err)
+	}
 	return true
 }
 
