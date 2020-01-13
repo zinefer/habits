@@ -113,9 +113,11 @@ func (c *Subcommand) Run() bool {
 	filesDir := filepath.Join(workDir, "web/dist")
 	FileServer(r, "/", filesDir)
 
-	/*if c.config.IsProduction() {
+	if c.config.IsProduction() {
 		r.Get("/.well-known/acme-challenge/{challenge:.+}", redirectToStorageAccount(c.config))
+	}
 
+	/*if c.config.IsProduction() {
 		tlsServer := &http.Server{
 			Addr:    ":443",
 		}
