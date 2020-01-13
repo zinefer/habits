@@ -113,7 +113,7 @@ func (c *Subcommand) Run() bool {
 	filesDir := filepath.Join(workDir, "web/dist")
 	FileServer(r, "/", filesDir)
 
-	if c.config.IsProduction() {
+	/*if c.config.IsProduction() {
 		r.Get("/.well-known/acme-challenge/{challenge:.+}", redirectToStorageAccount(c.config))
 
 		tlsServer := &http.Server{
@@ -126,7 +126,7 @@ func (c *Subcommand) Run() bool {
 			fmt.Println("tlsServer.ListendAndServeTLS() failed with")
 			panic(err)
 		}
-	} else {
+	} else {*/
 		server := &http.Server{
 			Addr:    c.config.ListenAddress,
 			Handler: r,
@@ -138,7 +138,7 @@ func (c *Subcommand) Run() bool {
 			fmt.Println("server.ListenAndServe() failed with")
 			panic(err)
 		}
-	}
+	//}
 
 	return true
 }
