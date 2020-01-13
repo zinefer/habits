@@ -44,6 +44,6 @@ COPY --from=jsbuilder /app/web/dist           ./web/dist
 
 RUN echo ${COMMIT} > ./web/dist/version
 
-EXPOSE 443
+EXPOSE 80
 ENV HABITS_ENVIRONMENT=production
 CMD ["./habits", "serve"]
