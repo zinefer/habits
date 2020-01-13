@@ -39,6 +39,9 @@ type Configuration struct {
 	FacebookClientSecret string
 	// Database
 	Database *DatabaseConfiguration
+	// https://github.com/MarcStan/lets-encrypt-azure backed storage account
+	// containing our ACME proofs
+	AcmeStorageRedirectHost string
 }
 
 // New - Construct a new application config
@@ -56,12 +59,15 @@ func New() *Configuration {
 	flag.StringVar(&c.Environment, "env", env, "Environment to run application in")
 	flag.StringVar(&c.ListenAddress, "listen-addr", ":80", "server listen address")
 
+	// oAuth
 	flag.StringVar(&c.GithubClientID, "auth-github-id", os.Getenv("HABITS_OAUTH_GITHUB_ID"), "github oauth client id")
 	flag.StringVar(&c.GithubClientSecret, "auth-github-secret", os.Getenv("HABITS_OAUTH_GITHUB_SECRET"), "github oauth client secret")
 	flag.StringVar(&c.GoogleClientID, "auth-google-id", os.Getenv("HABITS_OAUTH_GOOGLE_ID"), "google oauth client id")
 	flag.StringVar(&c.GoogleClientSecret, "auth-google-secret", os.Getenv("HABITS_OAUTH_GOOGLE_SECRET"), "google oauth client secret")
 	flag.StringVar(&c.FacebookClientID, "auth-facebook-id", os.Getenv("HABITS_OAUTH_FACEBOOK_ID"), "facebook oauth client id")
 	flag.StringVar(&c.FacebookClientSecret, "auth-facebook-secret", os.Getenv("HABITS_OAUTH_FACEBOOK_SECRET"), "facebook oauth client secret")
+
+	flag.StringVar(&c.AcmeStorageRedirectHost, "acme-storage-redirect-host", os.Getenv("HABITS_ACME_REDIRECT"), "ACME storage redirect host")
 
 	flag.Parse()
 

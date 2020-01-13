@@ -1,15 +1,12 @@
 package serve
 
 import (
-	"crypto/tls"
 	"encoding/gob"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"golang.org/x/crypto/acme/autocert"
 
 	"github.com/jmoiron/sqlx"
 
@@ -117,18 +114,10 @@ func (c *Subcommand) Run() bool {
 	FileServer(r, "/", filesDir)
 
 	if c.config.IsProduction() {
-		certMan := &autocert.Manager{
-			Prompt:     autocert.AcceptTOS,
-			Cache:      autocert.DirCache(config.CertsConfigPath),
-			HostPolicy: autocert.HostWhitelist(c.config.Hostname, "www."+c.config.Hostname),
-		}
+		r.Get("/.well-known/acme-challenge/{challenge:.+}", redirectToStorageAccount(c.config))
 
 		tlsServer := &http.Server{
 			Addr:    ":443",
-			Handler: certMan.HTTPHandler(r),
-			TLSConfig: &tls.Config{
-				GetCertificate: certMan.GetCertificate,
-			},
 		}
 
 		fmt.Printf("Starting HTTPS server on %s\n", tlsServer.Addr)
@@ -187,6 +176,15 @@ func FileServer(r chi.Router, path string, filesDir string) {
 	r.Get("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fs.ServeHTTP(w, r)
 	}))
+}
+
+func redirectToStorageAccount(c *config.Configuration) func(res http.ResponseWriter, req *http.Request) {
+	return func(res http.ResponseWriter, req *http.Request) {
+		challenge := chi.URLParam(req, "challenge")
+		url := fmt.Sprintf("%v/.well-known/acme-challenge/%v", c.AcmeStorageRedirectHost, challenge)
+		res.Header().Set("Location", url)
+		res.WriteHeader(http.StatusTemporaryRedirect)
+	}
 }
 
 func rerouteToIndexOn404(next http.Handler) http.Handler {
