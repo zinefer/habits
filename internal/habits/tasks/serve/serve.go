@@ -184,6 +184,7 @@ func redirectToStorageAccount(c *config.Configuration) func(res http.ResponseWri
 	return func(res http.ResponseWriter, req *http.Request) {
 		challenge := chi.URLParam(req, "challenge")
 		url := fmt.Sprintf("%v/.well-known/acme-challenge/%v", c.AcmeStorageRedirectHost, challenge)
+		fmt.Println("Redirecting ACME request to storage: ", url)
 		res.Header().Set("Location", url)
 		res.WriteHeader(http.StatusTemporaryRedirect)
 	}
