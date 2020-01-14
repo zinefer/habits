@@ -2,6 +2,8 @@ import Cookies from "js-cookie";
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
+import Privacy from "../views/privacy.vue";
+import Terms from "../views/terms.vue";
 import Habits from "../views/habits.vue";
 
 Vue.use(VueRouter);
@@ -14,6 +16,16 @@ const routes = [
     meta: {
       redirectHabitsIfAuthed: true
     }
+  },
+  {
+    path: "/privacy",
+    name: "Privacy",
+    component: Privacy
+  },
+  {
+    path: "/terms",
+    name: "Terms",
+    component: Terms
   },
   {
     path: "/habits/:user",
