@@ -122,6 +122,8 @@ resource "azurerm_app_service" "habits" {
   location            = azurerm_resource_group.habits.location
   resource_group_name = azurerm_resource_group.habits.name
   app_service_plan_id = azurerm_app_service_plan.habits.id
+  
+  https_only = true
 
   identity {
     type = "SystemAssigned"
