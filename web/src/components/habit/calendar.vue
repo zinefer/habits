@@ -227,7 +227,10 @@ export default {
       if (this.isMobile) {
         var today = new Date();
         return this.values.slice(
-          this.values.length - this.displayedWeeks * 7 + today.getDay() + 2
+          this.values.length -
+            1 -
+            this.displayedWeeks * 7 +
+            (7 - today.getDay())
         );
       }
       return this.values;
