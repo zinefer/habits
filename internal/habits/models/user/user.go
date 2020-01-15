@@ -2,11 +2,15 @@ package user
 
 import (
 	"context"
+	"regexp"
+	"strings"
 
 	"github.com/zinefer/habits/internal/habits/middlewares/database"
 
 	"github.com/zinefer/habits/internal/habits/models/habit"
 )
+
+const cleanNameRegex = "[^a-z0-9-_]+"
 
 // User model
 type User struct {
@@ -20,10 +24,14 @@ type User struct {
 
 // New Creates a User model
 func New(providerID string, provider string, name string, realname string, email string) *User {
+	cleanName := strings.ToLower(name)
+	cleanName = strings.ReplaceAll(cleanName, " ", "-")
+	reg := regexp.MustCompile(cleanNameRegex)
+	cleanName = reg.ReplaceAllString(cleanName, "")
 	return &User{
 		ProviderID: providerID,
 		Provider:   provider,
-		Name:       name,
+		Name:       cleanName,
 		RealName:   realname,
 		Email:      email,
 	}

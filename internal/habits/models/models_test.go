@@ -89,6 +89,12 @@ func (suite *TestSuite) TestUser() {
 		admin, err := user.FindByID(r.Context(), u1.ID)
 		assert.NoError(suite.T(), err)
 		assert.Equal(suite.T(), u1, admin)
+
+		u4 := user.New("2", "test", "timmy timmer", "kim", "tim@tommy.com")
+		assert.Equal(suite.T(), "timmy-timmer", u4.Name)
+
+		u5 := user.New("2", "test", "()#HarryPotter!$!", "kim", "tim@tommy.com")
+		assert.Equal(suite.T(), "harrypotter", u5.Name)
 	})
 
 	ts := httptest.NewServer(r)
