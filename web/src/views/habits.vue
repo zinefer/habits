@@ -1,12 +1,29 @@
 <template>
-  <v-container fluid :class="{ 'pt-10': pushContentDown }">
-    <v-row dense v-for="habit in habits" :key="habit.ID" class="mb-6">
-      <v-spacer />
-      <v-col cols="10">
-        <HabitCard :habit="habit" :isMobile="isMobile" />
-      </v-col>
-      <v-spacer />
-    </v-row>
+  <v-container fluid :class="{ 'pt-10': pushContentDown, 'col-10': true }">
+    <v-alert
+      color="primary"
+      dark
+      icon="mdi-vuetify"
+      border="top"
+      prominent
+      v-if="!loading && habits.length == 0 && isLoggedIn"
+    >
+      Welcome! To start tracking a habit click on the
+      <v-avatar color="secondary" size="32">
+        <v-icon dark>mdi-checkerboard-plus</v-icon>
+      </v-avatar>
+      button on the left.
+    </v-alert>
+    <v-alert type="error" v-if="error && user != nil">
+      Error retrieving Habits for {{ user }}
+    </v-alert>
+    <HabitCard
+      :habit="habit"
+      :isMobile="isMobile"
+      v-for="habit in habits"
+      :key="habit.ID"
+      class="mb-8"
+    />
   </v-container>
 </template>
 
@@ -21,6 +38,7 @@ export default {
   name: "Habits",
   data() {
     return {
+      error: false,
       loading: true,
       habits: []
     };
@@ -47,6 +65,9 @@ export default {
         HabitsApi.getByUser(this.user)
           .then(resp => {
             this.habits = resp.data;
+          })
+          .catch(() => {
+            this.error = true;
           })
           .finally(() => {
             this.loading = false;
