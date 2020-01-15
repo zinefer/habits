@@ -1,5 +1,5 @@
 <template>
-  <div class="privacy ml-auto mr-auto">
+  <div class="privacy ml-auto mr-auto pa-2">
     <h2 class="mb-2">Privacy Policy</h2>
     <p>
       Your privacy is important to us. It is Habits' policy to respect your

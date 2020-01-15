@@ -1,5 +1,5 @@
 <template>
-  <div class="terms ml-auto mr-auto">
+  <div class="terms ml-auto mr-auto pa-2">
     <h2 class="mb-2">Habits Terms of Service</h2>
     <h3>1. Terms</h3>
     <p>
