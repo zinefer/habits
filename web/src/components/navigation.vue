@@ -27,7 +27,7 @@
       <template v-slot:activator="{ on }">
         <v-btn v-on="on" outlined>
           <v-icon class="pr-2">mdi-account-circle</v-icon>
-          Zinefer
+          {{ currentUser }}
           <v-icon>mdi-menu-down</v-icon>
         </v-btn>
       </template>
@@ -89,6 +89,9 @@ export default {
   computed: {
     isLoggedIn: function() {
       return this.$store.getters.isLoggedIn;
+    },
+    currentUser: function() {
+      return this.$store.getters.currentUser;
     }
   },
   methods: {

@@ -6,16 +6,17 @@ describe("Application navigation", () => {
 
   beforeEach(() => {
     options = {
-      stubs: [
-        "v-app-bar",
-        "v-img",
-        "v-spacer",
-        "v-menu",
-        "v-list",
-        "v-list-item",
-        "v-list-item-title",
-        "v-btn"
-      ],
+      stubs: {
+        "v-app-bar": true,
+        "v-img": true,
+        "v-spacer": true,
+        "v-menu": '<div class="v-menu"><slot/><slot name="activator"/></div>',
+        "v-list": true,
+        "v-list-item": true,
+        "v-list-item-title": true,
+        "v-icon": true,
+        "v-btn": true
+      },
       mocks: {
         $store: {
           getters: {
@@ -30,7 +31,7 @@ describe("Application navigation", () => {
     wrapper.destroy();
   });
 
-  it("renders our name", () => {
+  it("renders the app name", () => {
     wrapper = shallowMount(Navigation, options);
     expect(wrapper.text()).toContain("Habits");
   });
@@ -43,6 +44,16 @@ describe("Application navigation", () => {
   it("renders the user dropdown when logged in", () => {
     options.mocks.$store.getters.isLoggedIn = true;
     wrapper = shallowMount(Navigation, options);
-    expect(wrapper.find("v-menu-stub").text()).toContain("Sign out");
+    expect(wrapper.find(".v-menu").text()).toContain("Sign out");
+  });
+
+  it("renders the user name when logged in", () => {
+    let random = Math.random()
+      .toString(36)
+      .substring(7);
+    options.mocks.$store.getters.isLoggedIn = true;
+    options.mocks.$store.getters.currentUser = random;
+    wrapper = shallowMount(Navigation, options);
+    expect(wrapper.text()).toContain(random);
   });
 });

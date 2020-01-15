@@ -5,11 +5,12 @@ window.Cookies = Cookies;
 export default {
   state: {
     status: "",
-    token: Cookies.get("current_user") || "",
+    currentUser: Cookies.get("current_user") || "",
     user: {}
   },
   getters: {
-    isLoggedIn: state => !!state.token,
+    isLoggedIn: state => !!state.currentUser,
+    currentUser: state => state.currentUser,
     authStatus: state => state.status
   }
 };
