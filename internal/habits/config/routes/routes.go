@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/go-chi/chi"
 
+	"github.com/zinefer/habits/internal/habits/config"
 	"github.com/zinefer/habits/internal/habits/middlewares/authorize"
 	"github.com/zinefer/habits/internal/habits/middlewares/habit"
 
@@ -12,11 +13,15 @@ import (
 )
 
 // Define routes for the habits app
-func Define(r *chi.Mux) {
+func Define(c *config.Configuration, r *chi.Mux) {
 	r.Route("/api", func(r chi.Router) {
 		r.Get("/auth/{provider}/callback", auth.Callback())
 		r.Get("/auth/{provider}", auth.SignIn())
 		r.Get("/logout", auth.SignOut())
+
+		if c.IsDevelopment() {
+			r.Get("/fakeauth/{user:[a-z0-9-_]+}", auth.FakeAuth())
+		}
 
 		r.Get("/habits/{user:[a-z0-9-_]+}", habits.UserList())
 
@@ -26,7 +31,7 @@ func Define(r *chi.Mux) {
 			rAuth.Get("/", habits.List())
 			rAuth.Post("/", habits.Create())
 			rAuth.Route("/{id:[0-9]+}", func(r chi.Router) {
-				r.With(habit.HabitContextMiddleware())
+				r.Use(habit.HabitContextMiddleware())
 
 				r.Get("/", habits.Show())
 

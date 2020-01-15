@@ -107,7 +107,7 @@ func (c *Subcommand) Run() bool {
 	r.Use(sessionMW.SessionContextMiddleware(session))
 	r.Use(rerouteToIndexOn404)
 
-	routes.Define(r)
+	routes.Define(c.config, r)
 
 	workDir, _ := os.Getwd()
 	filesDir := filepath.Join(workDir, "web/dist")
@@ -117,30 +117,17 @@ func (c *Subcommand) Run() bool {
 		r.Get("/.well-known/acme-challenge/{challenge:.+}", redirectToStorageAccount(c.config))
 	}
 
-	/*if c.config.IsProduction() {
-		tlsServer := &http.Server{
-			Addr:    ":443",
-		}
+	server := &http.Server{
+		Addr:    c.config.ListenAddress,
+		Handler: r,
+	}
 
-		fmt.Printf("Starting HTTPS server on %s\n", tlsServer.Addr)
-		err := tlsServer.ListenAndServeTLS("", "")
-		if err != nil {
-			fmt.Println("tlsServer.ListendAndServeTLS() failed with")
-			panic(err)
-		}
-	} else {*/
-		server := &http.Server{
-			Addr:    c.config.ListenAddress,
-			Handler: r,
-		}
-
-		fmt.Printf("Starting HTTP server on %s\n", c.config.ListenAddress)
-		err := server.ListenAndServe()
-		if err != nil {
-			fmt.Println("server.ListenAndServe() failed with")
-			panic(err)
-		}
-	//}
+	fmt.Printf("Starting HTTP server on %s\n", c.config.ListenAddress)
+	err := server.ListenAndServe()
+	if err != nil {
+		fmt.Println("server.ListenAndServe() failed with")
+		panic(err)
+	}
 
 	return true
 }

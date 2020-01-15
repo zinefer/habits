@@ -37,6 +37,22 @@ func SignIn() func(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// FakeAuth is a helper for development to relieve the need to setup oAuth
+// DO NOT RUN THIS IN PRODUCTION
+func FakeAuth() func(res http.ResponseWriter, req *http.Request) {
+	return func(res http.ResponseWriter, req *http.Request) {
+		userName := chi.URLParam(req, "user")
+
+		u, _ := user.FindByName(req.Context(), userName)
+		if u.ID == 0 {
+			http.Error(res, http.StatusText(404), 404)
+			return
+		}
+
+		postLogin(req.Context(), res, req, u)
+	}
+}
+
 // Callback completes an oauth handshake
 func Callback() func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {

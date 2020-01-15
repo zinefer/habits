@@ -73,6 +73,8 @@ func New() *Configuration {
 
 	if c.IsProduction() {
 		SecretConfigPath = "/home/secret"
+	} else {
+		c.Hostname = fmt.Sprintf("127.0.0.1%v", c.ListenAddress)
 	}
 
 	c.parseDatabaseConfig()
@@ -122,6 +124,11 @@ func (c *Configuration) CreateSecretConfig() []byte {
 // IsProduction returns true if the application is running in production
 func (c *Configuration) IsProduction() bool {
 	return c.Environment == "production"
+}
+
+// IsDevelopment returns true if the application is running in development
+func (c *Configuration) IsDevelopment() bool {
+	return c.Environment == "development"
 }
 
 func (c *Configuration) parseDatabaseConfig() {
