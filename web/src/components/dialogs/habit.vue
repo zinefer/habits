@@ -57,6 +57,7 @@ export default {
           .then(resp => {
             if (resp.status == 200) {
               this.dialogVisible = false;
+              this.habit = {};
               EventBus.$emit("reloadHabits");
             } else {
               alert("Unknown error updating habit");
@@ -70,6 +71,7 @@ export default {
           .then(resp => {
             if (resp.status == 201) {
               this.dialogVisible = false;
+              this.habit = {};
               EventBus.$emit("reloadHabits");
             } else {
               alert("Unknown error creating habit");
@@ -82,6 +84,7 @@ export default {
     },
     close() {
       this.dialogVisible = false;
+      this.habit = {};
     }
   },
   computed: {
