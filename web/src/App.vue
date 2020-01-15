@@ -2,11 +2,7 @@
   <v-app>
     <Navigation />
     <v-content>
-      <div
-        ref="tooltip"
-        class="tooltip v-tooltip__content"
-        style="display:none"
-      />
+      <div ref="tooltip" class="tooltip" style="display:none" />
       <router-view />
     </v-content>
   </v-app>
@@ -40,5 +36,17 @@ export default {
 .tooltip {
   z-index: 100;
   position: absolute;
+  background: rgba(97, 97, 97, 0.9);
+  color: #ffffff;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 22px;
+  display: inline-block;
+  padding: 5px 16px;
+  position: absolute;
+  text-transform: initial;
+  width: auto;
+  opacity: 1;
+  pointer-events: none;
 }
 </style>

@@ -96,7 +96,7 @@ import { EventBus } from "@/event_bus";
 
 export default {
   name: "HabitCard",
-  props: ["habit", "isMobile", "hideActions"],
+  props: ["habit", "isMobile", "showActions"],
   data() {
     return {
       loading: true,

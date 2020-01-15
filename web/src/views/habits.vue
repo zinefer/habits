@@ -3,16 +3,22 @@
     <v-alert
       color="primary"
       dark
-      icon="mdi-vuetify"
+      icon="mdi-food-apple"
       border="top"
       prominent
       v-if="!loading && habits.length == 0 && isLoggedIn"
     >
       Welcome! To start tracking a habit click on the
       <v-avatar color="secondary" size="32">
-        <v-icon dark>mdi-checkerboard-plus</v-icon>
+        <v-icon small dark>mdi-checkerboard-plus</v-icon>
       </v-avatar>
-      button on the left.
+      button
+    </v-alert>
+    <v-alert
+      type="warning"
+      v-if="!loading && !error && habits.length == 0 && user != null"
+    >
+      {{ user }} is not tracking any habits
     </v-alert>
     <v-alert type="error" v-if="error && user != null">
       Error retrieving Habits for {{ user }}

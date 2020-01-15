@@ -181,13 +181,20 @@ export default {
     },
     calendarMonthY(w) {
       if (this.isMobile) {
-        return (
+        var y =
           w * this.squareSize +
-          w +
+          w + // the gap between each row
           this.squareSize +
           this.squareSize -
-          this.textHeight / 2
-        );
+          this.textHeight / 2;
+
+        // Prevent a month getting displayed on the final week from being
+        // pushed off the image due to trying to span the gap
+        if (w == this.displayedWeeks - 1) {
+          y -= this.textHeight / 2 + w - 2;
+        }
+
+        return y;
       }
       return this.textHeight;
     }
