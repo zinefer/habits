@@ -1,6 +1,7 @@
 <template>
   <v-card style="position:relative">
     <v-speed-dial
+      v-if="showActions"
       class="options"
       absolute
       v-model="optionsOpen"
@@ -68,7 +69,7 @@
         />
       </v-scale-transition>
     </v-card-text>
-    <v-fab-transition>
+    <v-fab-transition v-if="showActions">
       <v-btn
         color="secondary"
         fab
@@ -95,7 +96,7 @@ import { EventBus } from "@/event_bus";
 
 export default {
   name: "HabitCard",
-  props: ["habit", "isMobile"],
+  props: ["habit", "isMobile", "hideActions"],
   data() {
     return {
       loading: true,

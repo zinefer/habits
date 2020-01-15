@@ -14,11 +14,12 @@
       </v-avatar>
       button on the left.
     </v-alert>
-    <v-alert type="error" v-if="error && user != nil">
+    <v-alert type="error" v-if="error && user != null">
       Error retrieving Habits for {{ user }}
     </v-alert>
     <HabitCard
       :habit="habit"
+      :showActions="isLoggedIn && user == null"
       :isMobile="isMobile"
       v-for="habit in habits"
       :key="habit.ID"
