@@ -116,7 +116,7 @@ export default {
         .join(" ");
 
       this.$emit("showTooltip", {
-        top: transform.top - 20,
+        top: transform.top + window.scrollY - 70,
         left: transform.left,
         text: date + ": " + event.currentTarget.getAttribute("count")
       });
