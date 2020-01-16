@@ -6,7 +6,9 @@
       icon="mdi-food-apple"
       border="top"
       prominent
-      v-if="!loading && habits.length == 0 && isLoggedIn"
+      v-if="
+        !loading && !error && habits.length == 0 && isLoggedIn && user == null
+      "
     >
       Welcome! To start tracking a habit click on the
       <v-avatar color="secondary" size="32">
