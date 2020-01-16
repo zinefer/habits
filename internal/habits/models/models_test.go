@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/jmoiron/sqlx"
@@ -88,6 +89,7 @@ func (suite *TestSuite) TestUser() {
 
 		admin, err := user.FindByID(r.Context(), u1.ID)
 		assert.NoError(suite.T(), err)
+		u1.Created = admin.Created
 		assert.Equal(suite.T(), u1, admin)
 
 		u4 := user.New("2", "test", "timmy timmer", "kim", "tim@tommy.com")
@@ -124,9 +126,15 @@ func (suite *TestSuite) TestActivity() {
 		h := habit.New(u.ID, "habit testing")
 		h.Save(r.Context())
 
-		a := activity.New(h.ID)
-		err := a.Save(r.Context())
-		assert.NoError(suite.T(), err, "Saved Activity with no errors")
+		a1 := activity.New(h.ID, time.Time{}, -7)
+		err := a1.Save(r.Context())
+		assert.NoError(suite.T(), err, "Saved Activity (zero moment) with no errors")
+
+		moment := time.Date(2009, 11, 17, 20, 34, 58, 651387237, time.UTC)
+		a2 := activity.New(h.ID, moment, -7)
+		err = a2.Save(r.Context())
+		assert.Equal(suite.T(), moment, a2.Moment)
+		assert.NoError(suite.T(), err, "Saved Activity (with moment) with no errors")
 	})
 
 	ts := httptest.NewServer(r)

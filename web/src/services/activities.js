@@ -14,8 +14,9 @@ export default {
       .catch(error => konsole.log(error));
   },
   create(habit_id) {
+    var timezone = Math.round((new Date().getTimezoneOffset() / 60) * -1);
     return axios
-      .post("/api/habits/" + habit_id + "/activities", {})
+      .post("/api/habits/" + habit_id + "/activities", { TimeZone: timezone })
       .catch(error => konsole.log(error));
   }
 };

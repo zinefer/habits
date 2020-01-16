@@ -5,27 +5,39 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/jmoiron/sqlx"
+
 	"github.com/zinefer/habits/internal/habits/middlewares/database"
 )
 
 // Activity model
 type Activity struct {
-	ID      int64
-	HabitID int64 `db:"habit_id"`
-	Created time.Time
+	ID       int64
+	HabitID  int64 `db:"habit_id"`
+	Moment   time.Time
+	TimeZone int64 `db:"time_zone"`
+	Created  time.Time
 }
 
 // New Activity model
-func New(habitID int64) *Activity {
+func New(habitID int64, moment time.Time, timezone int64) *Activity {
 	return &Activity{
-		HabitID: habitID,
+		HabitID:  habitID,
+		Moment: moment,
+		TimeZone: timezone,
 	}
 }
 
 // Save an Activity to the database
 func (a *Activity) Save(ctx context.Context) error {
 	db := database.GetDbFromContext(ctx)
-	stmt, err := db.PrepareNamed("INSERT INTO activities (habit_id) VALUES (:habit_id) RETURNING id;")
+	var stmt *sqlx.NamedStmt
+	var err error
+	if a.Moment.IsZero() {
+		stmt, err = db.PrepareNamed("INSERT INTO activities (habit_id, moment, time_zone) VALUES (:habit_id, CURRENT_TIMESTAMP + :time_zone * INTERVAL '1 hour', :time_zone) RETURNING id;")
+	} else {
+		stmt, err = db.PrepareNamed("INSERT INTO activities (habit_id, moment, time_zone) VALUES (:habit_id, :moment, :time_zone) RETURNING id;")		
+	}
 	if err != nil {
 		return err
 	}
@@ -62,9 +74,9 @@ func CountByDayInLastYearByHabit(ctx context.Context, habitID int64) ([]*Activit
 			   date_trunc('day', now()) as ending
 	)
 	SELECT day, sum(count) as count FROM (
-		SELECT date_trunc('day', activities.created)::date as "day", count(*) as count
+		SELECT date_trunc('day', activities.moment)::date as "day", count(*) as count
 		FROM activities
-		WHERE activities.created >= (select beginning from date_range) AND habit_id = $1
+		WHERE activities.moment >= (select beginning from date_range) AND habit_id = $1
 		GROUP BY day
 		UNION
 		SELECT day::date, 0 as count
@@ -97,8 +109,8 @@ func GetStreaksByHabit(ctx context.Context, habitID int64) (*ActivityStreaks, er
 
 	_, err = tx.Exec(`WITH groups(date, grp) AS (
 		SELECT 
-		  DISTINCT created::date, 
-		  EXTRACT(epoch from created::date)::int / 86400 - DENSE_RANK() OVER (ORDER BY created::date) AS grp
+		  DISTINCT moment::date, 
+		  EXTRACT(epoch from moment::date)::int / 86400 - DENSE_RANK() OVER (ORDER BY moment::date) AS grp
 		FROM activities
 		WHERE habit_id = $1
 	  )

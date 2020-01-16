@@ -21,8 +21,7 @@ func Create() func(res http.ResponseWriter, req *http.Request) {
 		}
 
 		habit := habitMW.GetHabitFromContext(req)
-
-		activity := activity.New(habit.ID)
+		activity := activity.New(habit.ID, data.Moment, data.TimeZone)
 		err := activity.Save(req.Context())
 		if err != nil {
 			fmt.Println(err)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/zinefer/habits/internal/habits/middlewares/database"
 
@@ -20,6 +21,7 @@ type User struct {
 	Name       string
 	RealName   string `db:"real_name"`
 	Email      string
+	Created    time.Time
 }
 
 // New Creates a User model
