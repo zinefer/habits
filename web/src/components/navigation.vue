@@ -38,7 +38,7 @@
       </v-list>
     </v-menu>
 
-    <template v-slot:extension v-if="isLoggedIn">
+    <template v-slot:extension v-if="isLoggedIn && showAddHabitButton">
       <v-fab-transition>
         <v-btn
           ref="add_habit"
@@ -87,6 +87,9 @@ export default {
     });
   },
   computed: {
+    showAddHabitButton: function() {
+      return this.$route.name == "Habits";
+    },
     isLoggedIn: function() {
       return this.$store.getters.isLoggedIn;
     },
