@@ -10,7 +10,7 @@
         width="40"
       />
 
-      <span class="display-1 font-weight-bold">
+      <span class="display-1 font-weight-bold" href="/">
         Habits
       </span>
     </div>
@@ -88,7 +88,7 @@ export default {
   },
   computed: {
     showAddHabitButton: function() {
-      return this.$route.name == "Habits";
+      return this.$route && this.$route.name == "Habits";
     },
     isLoggedIn: function() {
       return this.$store.getters.isLoggedIn;
