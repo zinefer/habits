@@ -37,7 +37,10 @@ func Create() func(res http.ResponseWriter, req *http.Request) {
 func ListLastYear() func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 		habit := habitMW.GetHabitFromContext(req)
-		activities, err := habit.CountActivitiesInLastYear(req.Context())
+		
+		timezone, _ := req.Context().Value("timezone").(int)
+		
+		activities, err := habit.CountActivitiesInLastYear(req.Context(), timezone)
 		if err != nil {
 			fmt.Println(err)
 			http.Error(res, http.StatusText(400), 400)

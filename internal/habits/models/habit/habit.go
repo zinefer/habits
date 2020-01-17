@@ -58,8 +58,8 @@ func (h *Habit) Delete(ctx context.Context) error {
 }
 
 // CountActivitiesInLastYear counts the activities in the past year
-func (h *Habit) CountActivitiesInLastYear(ctx context.Context) ([]*activity.ActivityCount, error) {
-	return activity.CountByDayInLastYearByHabit(ctx, h.ID)
+func (h *Habit) CountActivitiesInLastYear(ctx context.Context, timezone int) ([]*activity.ActivityCount, error) {
+	return activity.CountByDayInLastYearByHabit(ctx, h.ID, timezone)
 }
 
 // GetStreaks returns activity streaks

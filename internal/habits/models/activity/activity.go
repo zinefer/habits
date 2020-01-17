@@ -66,22 +66,21 @@ type ActivityCount struct {
 }
 
 // CountByDayInLastYearByHabit returns a count of the last years activity by habit
-func CountByDayInLastYearByHabit(ctx context.Context, habitID int64) ([]*ActivityCount, error) {
+func CountByDayInLastYearByHabit(ctx context.Context, habitID int64, timezone int) ([]*ActivityCount, error) {
 	db := database.GetDbFromContext(ctx)
 	counts := []*ActivityCount{}
-	err := db.Select(&counts, `WITH date_range AS (
-		SELECT date_trunc('day', now() - (364 + extract(dow from now())) * interval '1 day') as beginning,
-			   date_trunc('day', now()) as ending
-	)
+	err := db.Select(&counts, `WITH now AS (
+		SELECT CURRENT_TIMESTAMP + $2 * INTERVAL '1 hour' AS timestamp
+	), date_range AS (
+	  SELECT date_trunc('day', (SELECT timestamp FROM now) - 371 * interval '1 day') as beginning,
+	  date_trunc('day', (SELECT timestamp FROM now)) as ending
+	)	
 	SELECT day, sum(count) as count FROM (
 		SELECT date_trunc('day', activities.moment)::date as "day", count(*) as count
 		FROM activities
 		WHERE activities.moment >= (select beginning from date_range) AND habit_id = $1
 		GROUP BY day
-		UNION
-		SELECT day::date, 0 as count
-		FROM generate_series((select beginning from date_range), (select ending from date_range), '1 day') day
-	) as activities GROUP BY day ORDER BY day;`, habitID)
+	) as activities GROUP BY day ORDER BY day;`, habitID, timezone)
 	return counts, err
 }
 

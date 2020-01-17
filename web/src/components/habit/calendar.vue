@@ -74,6 +74,12 @@ const months = [
   "Dec"
 ];
 
+Date.prototype.addDays = function(days) {
+  var dat = new Date(this.valueOf());
+  dat.setDate(dat.getDate() + days);
+  return dat;
+};
+
 export default {
   name: "HabitCalendar",
   props: {
@@ -231,16 +237,53 @@ export default {
       return 53;
     },
     filteredValues: function() {
+      var data = [],
+        today = new Date(),
+        yearAgoTs =
+          Math.round(today.getTime() / 1000) -
+          (364 + today.getDay()) * 24 * 60 * 60,
+        yearAgo = new Date(yearAgoTs * 1000),
+        vIndex = 0,
+        startDate = yearAgo,
+        stopDate = today,
+        date = startDate;
+
+      while (date <= stopDate) {
+        var datestr = date
+          .toLocaleString("sv", { timeZoneName: "short" })
+          .slice(0, 10);
+
+        if (
+          this.values[vIndex] &&
+          new Date(this.values[vIndex].Day) < startDate
+        ) {
+          vIndex++;
+          continue;
+        }
+
+        if (
+          this.values[vIndex] &&
+          datestr == this.values[vIndex].Day.slice(0, 10)
+        ) {
+          data.push(this.values[vIndex]);
+          vIndex++;
+        } else {
+          data.push({
+            Count: 0,
+            Day: datestr
+          });
+        }
+
+        date = date.addDays(1);
+      }
+
       if (this.isMobile) {
-        var today = new Date();
-        return this.values.slice(
-          this.values.length -
-            1 -
-            this.displayedWeeks * 7 +
-            (7 - today.getDay())
+        return data.slice(
+          data.length - 1 - this.displayedWeeks * 7 + (7 - today.getDay())
         );
       }
-      return this.values;
+
+      return data;
     }
   }
 };
