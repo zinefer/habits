@@ -20,7 +20,7 @@
           </p>
           <p class="caption">
             Made with <v-icon color="red" small>mdi-heart</v-icon> on
-            <a href="github.com/zinefer/habits">Github</a>
+            <a href="https://github.com/zinefer/habits">Github</a>
           </p>
         </v-flex>
       </v-layout>
