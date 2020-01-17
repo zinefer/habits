@@ -245,14 +245,13 @@ export default {
         yearAgo = new Date(yearAgoTs * 1000),
         vIndex = 0,
         startDate = yearAgo,
-        stopDate = today,
-        date = startDate;
+        stopDate = today;
 
+      startDate.setHours(0);
+      stopDate.setHours(23, 59, 59);
+
+      var date = startDate;
       while (date <= stopDate) {
-        var datestr = date
-          .toLocaleString("sv", { timeZoneName: "short" })
-          .slice(0, 10);
-
         if (
           this.values[vIndex] &&
           new Date(this.values[vIndex].Day) < startDate
@@ -260,6 +259,10 @@ export default {
           vIndex++;
           continue;
         }
+
+        var datestr = date
+          .toLocaleString("sv", { timeZoneName: "short" })
+          .slice(0, 10);
 
         if (
           this.values[vIndex] &&
