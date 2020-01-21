@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <Navigation />
+    <Navigation ref="nav" />
     <v-content>
       <div ref="tooltip" class="tooltip" style="display:none" />
       <router-view />
@@ -19,7 +19,7 @@ export default {
       var tooltip = this.$refs.tooltip;
       tooltip.innerHTML = "<span>" + event.text + "</span>";
       tooltip.style.display = "initial";
-      tooltip.style.top = event.top + "px";
+      tooltip.style.top = event.top - this.$refs.nav.$el.clientHeight + "px";
       tooltip.style.left = event.left - tooltip.scrollWidth / 2 + 15 + "px";
     });
     EventBus.$on("hideTooltip", () => {
