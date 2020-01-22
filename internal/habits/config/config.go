@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -111,7 +112,7 @@ func (c *Configuration) readVersionFile() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	c.Version = string(data)
+	c.Version = strings.TrimSpace(string(data))
 }
 
 func (c *Configuration) readSecretConfig() {
