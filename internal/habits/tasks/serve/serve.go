@@ -90,14 +90,14 @@ func (c *Subcommand) Run() bool {
 	dCtx := database.SetDbInContext(context.Background(), c.db)
 	oldDeployment, err := deployment.VersionPresent(dCtx, c.config.Version)
 	if err != nil {
-		fmt.Println("Fatal Error: unable to check version deployment status")
+		fmt.Println("Fatal Error: unable to check version deployment status ", c.config.Version)
 		panic(err)
 	}
 	if oldDeployment == false {
 		c.config.ResetSecretConfig()
 		err := deployment.New(c.config.Version).Save(dCtx)
 		if err != nil {
-			fmt.Println("Fatal Error: unable to save version deployment status")
+			fmt.Println("Fatal Error: unable to save version deployment status ", c.config.Version)
 			panic(err)
 		}
 	}
