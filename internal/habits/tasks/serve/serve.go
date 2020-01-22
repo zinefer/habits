@@ -1,6 +1,7 @@
 package serve
 
 import (
+	"context"
 	"encoding/gob"
 	"fmt"
 	"net/http"
@@ -28,6 +29,7 @@ import (
 	"github.com/zinefer/habits/internal/habits/config/routes"
 	"github.com/zinefer/habits/internal/habits/middlewares/database"
 	sessionMW "github.com/zinefer/habits/internal/habits/middlewares/session"
+	"github.com/zinefer/habits/internal/habits/models/deployment"
 	"github.com/zinefer/habits/internal/habits/models/user"
 )
 
@@ -85,6 +87,21 @@ func (c *Subcommand) Run() bool {
 		}
 	}
 
+	dCtx := database.SetDbInContext(context.Background(), c.db)
+	oldDeployment, err := deployment.VersionPresent(dCtx, c.config.Version)
+	if err != nil {
+		fmt.Println("Fatal Error: unable to check version deployment status")
+		panic(err)
+	}
+	if oldDeployment == false {
+		c.config.ResetSecretConfig()
+		err := deployment.New(c.config.Version).Save(dCtx)
+		if err != nil {
+			fmt.Println("Fatal Error: unable to save version deployment status")
+			panic(err)
+		}
+	}
+
 	baseAuthURL := "https://" + c.config.Hostname + "/api/auth/"
 	oauthProviders := []goth.Provider{}
 	if len(c.config.GithubClientID) > 0 && len(c.config.GithubClientSecret) > 0 {
@@ -123,7 +140,7 @@ func (c *Subcommand) Run() bool {
 	}
 
 	fmt.Printf("Starting HTTP server on %s\n", c.config.ListenAddress)
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 	if err != nil {
 		fmt.Println("server.ListenAndServe() failed with")
 		panic(err)

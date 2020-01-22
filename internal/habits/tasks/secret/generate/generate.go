@@ -25,6 +25,6 @@ func (c *Subcommand) Subcommander() *subcommander.Subcommander {
 
 // Run the secret:generate subcommand
 func (c *Subcommand) Run() bool {
-	data := c.config.CreateSecretConfig()
+	data := c.config.ResetSecretConfig()
 	return len(data) > 0
 }

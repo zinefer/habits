@@ -2,6 +2,11 @@ CREATE TABLE schema_migrations (
     version VARCHAR(14) UNIQUE NOT NULL
 );
 
+CREATE TABLE deployments (
+    version VARCHAR(7) UNIQUE NOT NULL,
+    created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE users (
     id          SERIAL PRIMARY KEY,
     provider_id TEXT NOT NULL,

@@ -15,10 +15,15 @@ const databaseContextKey dbKey = iota
 func DbContextMiddleware(db *sqlx.DB) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := context.WithValue(r.Context(), databaseContextKey, db)
+			ctx := SetDbInContext(r.Context(), db)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
+}
+
+// SetDbInContext returns a copy of ctx with a db set
+func SetDbInContext(ctx context.Context, db *sqlx.DB) context.Context {
+	return context.WithValue(ctx, databaseContextKey, db)
 }
 
 // GetDbFromContext returns a db

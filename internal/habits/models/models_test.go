@@ -19,6 +19,7 @@ import (
 	"github.com/zinefer/habits/internal/habits/middlewares/database"
 
 	"github.com/zinefer/habits/internal/habits/models/activity"
+	"github.com/zinefer/habits/internal/habits/models/deployment"
 	"github.com/zinefer/habits/internal/habits/models/habit"
 	"github.com/zinefer/habits/internal/habits/models/user"
 )
@@ -68,6 +69,31 @@ func (suite *TestSuite) SetupTest() {
 	r = chi.NewRouter()
 
 	r.Use(database.DbContextMiddleware(db))
+}
+
+func (suite *TestSuite) TestDeployment() {
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		d1 := deployment.New("abcdefg")
+		err := d1.Save(r.Context())
+		assert.NoError(suite.T(), err, "Saved Deployment with no errors")
+		assert.NotEqual(suite.T(), time.Time{}, d1.Created)
+
+		d2, err := deployment.FindByVersion(r.Context(), "abcdefg")
+		assert.NoError(suite.T(), err, "Found Deployment by version with no errors")
+		assert.Equal(suite.T(), d1, d2)
+
+		present, err := deployment.VersionPresent(r.Context(), "abcdefg")
+		assert.NoError(suite.T(), err, "VersionPresent with no errors")
+		assert.Equal(suite.T(), true, present)
+
+		present, err = deployment.VersionPresent(r.Context(), "nope")
+		assert.NoError(suite.T(), err, "VersionPresent with no errors")
+		assert.Equal(suite.T(), false, present)
+	})
+
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+	test.Request(suite.T(), ts, "GET", "/", nil)
 }
 
 func (suite *TestSuite) TestUser() {

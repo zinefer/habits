@@ -12,8 +12,6 @@ import (
 )
 
 var (
-	// CertsConfigPath points to a directory we will cache LTS certs in
-	CertsConfigPath = "/home/certs"
 	// SecretConfigPath points to the session secret file
 	SecretConfigPath = "secret"
 	// DatabaseConfigPath points to the database config yaml
@@ -22,10 +20,13 @@ var (
 	DatabaseSchemaPath = "database/schema.sql"
 	// DatabaseMigrationPath points to the database migrations
 	DatabaseMigrationPath = "database/migrations"
+	// VersionPath points to the application version hash
+	VersionPath = "web/dist/version"
 )
 
 // Configuration - Application config
 type Configuration struct {
+	Version       string
 	Hostname      string
 	Environment   string
 	ListenAddress string
@@ -77,8 +78,9 @@ func New() *Configuration {
 		c.Hostname = fmt.Sprintf("127.0.0.1%v", c.ListenAddress)
 	}
 
+	c.readVersionFile()
 	c.parseDatabaseConfig()
-	c.SessionSecret = c.readSecretConfig()
+	c.readSecretConfig()
 	os.Setenv("SESSION_SECRET", string(c.SessionSecret))
 
 	dbHost := os.Getenv("HABITS_DATABASE_HOST")
@@ -99,19 +101,36 @@ func New() *Configuration {
 	return &c
 }
 
-func (c *Configuration) readSecretConfig() []byte {
-	data, err := ioutil.ReadFile(SecretConfigPath)
-	if err != nil || len(data) == 0 {
-		if c.IsProduction() {
-			fmt.Println("Creating secret data for encrypting session")
-			data = c.CreateSecretConfig()
-		}
+func (c *Configuration) readVersionFile() {
+	if c.IsDevelopment() {
+		c.Version = "DEVELOP"
+		return
 	}
-	return data
+
+	data, err := ioutil.ReadFile(VersionPath)
+	if err != nil {
+		fmt.Println(err)
+	}
+	c.Version = string(data)
 }
 
-// CreateSecretConfig writes a random secret config
-func (c *Configuration) CreateSecretConfig() []byte {
+func (c *Configuration) readSecretConfig() {
+	data, err := ioutil.ReadFile(SecretConfigPath)
+	if err != nil || len(data) == 0 {
+		fmt.Println("Creating secret data for encrypting session")
+		data = c.createSecretConfig()
+	}
+	c.SessionSecret = data
+}
+
+// ResetSecretConfig resets the session secret
+func (c *Configuration) ResetSecretConfig() []byte {
+	c.createSecretConfig()
+	c.readSecretConfig()
+	return c.SessionSecret
+}
+
+func (c *Configuration) createSecretConfig() []byte {
 	data := generateRandomKey()
 	file, err := os.Create(SecretConfigPath)
 	_, err = file.Write(data)
