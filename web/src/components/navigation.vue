@@ -10,9 +10,9 @@
         width="40"
       />
 
-      <span class="display-1 font-weight-bold" href="/">
+      <a class="display-1 font-weight-bold" style="color:white">
         Habits
-      </span>
+      </a>
     </div>
 
     <v-spacer></v-spacer>
