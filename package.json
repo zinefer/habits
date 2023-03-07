@@ -30,7 +30,7 @@
   },
   "devDependencies": { },
   "optionalDependencies": {
-    "@vue/cli-plugin-e2e-cypress": "^4.1.0",
+    "@vue/cli-plugin-e2e-cypress": "^5.0.8",
     "@vue/cli-plugin-unit-jest": "^4.1.0",
     "@vue/eslint-config-prettier": "^5.0.0",
     "@vue/cli-plugin-eslint": "^4.1.0",
